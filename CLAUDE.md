@@ -91,6 +91,8 @@ scripts/copy-assets.sh  seleção reproduzível de assets a partir dos materiais
 | Números do hero com fonte (case) | Rastreabilidade; nada agregado ou inventado | somar usuários entre sistemas (inválido) |
 | "Como trabalhamos" = presença de papéis nos cases | Derivado dos dados; evita parecer headcount | somar pessoas (enganoso) |
 
+**Figma:** https://www.figma.com/design/zDCI4bFpUmYC1fFFfcu9Yj — página "Construção do site", frame "Home — 1440" (espelho do código; variáveis e text styles locais). O código continua sendo a fonte de verdade; alterações feitas no Figma precisam ser trazidas de volta manualmente.
+
 ## Pendências
 
 **Conteúdo**
@@ -123,3 +125,4 @@ Registro para a apresentação — onde a IA atuou e onde a supervisão humana d
 5. **Modelo de conteúdo** — IA estruturou 16 `.md` da revista + site atual em dados tipados, sem inventar nada; marcou pendências.
 6. **Seleção de UI kit** — IA recomendou Base UI contra shadcn/HeroUI com justificativa; humanos escolheram.
 7. **Implementação** — tokens, componentes, rotas, motion, SEO, redirects. IA verificou no browser (desktop e mobile) e corrigiu bug real de reveal em scroll rápido.
+8. **Code → Figma** — IA replicou a home (1440px) no arquivo Figma "Duda e Lucas Hackathon" via Figma MCP: mediu os valores computados no site (tamanhos de fonte, larguras de coluna, alturas de seção), criou a coleção de variáveis "SSD / Cores" (16 primitivos do manual + 12 semânticos com alias), 21 text styles (Syne/Space Grotesk) e montou 8 seções em auto-layout com imagens reais enviadas por upload. Altura final 10 856px vs 10 920px no site. Componente "Accordion/Item (fechado)" com instâncias.

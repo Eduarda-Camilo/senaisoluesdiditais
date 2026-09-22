@@ -32,3 +32,7 @@ Formato: **o que a IA fez → o que a supervisão humana decidiu**. Cronológico
 - Trocou "soma de pessoas" por "presença de papéis nos cases" ao perceber que a soma parecia headcount.
 - Removeu vínculo case↔AWS não confirmado.
 - Não nomeou Vale/Samarco (decisão humana) nem líderes técnicos.
+
+## 7. Code → Figma (22/09, noite)
+- **Humanos:** pediram a home replicada no Figma para refinamento visual.
+- **IA:** avaliou o arquivo (vazio), verificou fontes disponíveis, mediu no browser os valores computados a 1440px (h1 77,12px; display-lg 59,52px; colunas 764/532/416; alturas por seção) e reproduziu a página com auto-layout, variáveis vinculadas e text styles — não com um print. Enviou 6 assets (2 logos SVG, 4 mockups PNG) e ajustou crops (zoom 1,15 no hero; object-top no AVA). Corrigiu 4 problemas encontrados por screenshot (ordem resize→autoResize, componente sem hug, índice quebrando linha, inputs vazios com largura zero).
