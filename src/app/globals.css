@@ -1,26 +1,180 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ──────────────────────────────────────────────────────────────
+   DESIGN TOKENS — SENAI Soluções Digitais
+   Fonte: Branding Guide V.1 (2022) + decisões registradas no CLAUDE.md.
+   O site é dark por decisão; não há tema claro.
+   ────────────────────────────────────────────────────────────── */
+@theme {
+  /* Paleta da marca (nomes do manual) */
+  --color-azul-fibra: #004e95;
+  --color-azul-inteligente: #0096cc;
+  --color-azul-solucao: #0574d9;
+  --color-azul-digital: #00bcff;
+  --color-azul-cibernetico: #2a99ff;
+  --color-azul-futurista: #39cbff;
+  --color-azul-sistemico: #6ab8ff;
+  --color-azul-robotico: #73daff;
+  --color-azul-virtual: #aad6ff;
+  --color-azul-conectado: #ace9ff;
+  --color-neutra-100: #000000;
+  --color-neutra-200: #3e4144;
+  --color-neutra-300: #515257;
+  --color-neutra-400: #6e7278;
+  --color-laranja-senai: #e84910; /* extraído do logo SENAI; uso restrito a detalhes */
+
+  /* Semânticos */
+  --color-bg: #000000;
+  --color-surface: #0b0c0e;
+  --color-surface-2: #141518;
+  --color-line: rgb(255 255 255 / 0.12);
+  --color-line-strong: rgb(255 255 255 / 0.24);
+  --color-fg: #ffffff;
+  --color-fg-muted: #a3a8ae;
+  --color-fg-faint: #6e7278;
+  --color-accent: #0574d9;
+  --color-accent-hover: #2a99ff;
+  --color-accent-bright: #00bcff;
+  --color-mark: #e84910;
+
+  /* Tipografia */
+  --font-display: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+
+  /* Escala fluida (min @ 360px → max @ 1440px) */
+  --text-display-xl: clamp(2.5rem, 1.4rem + 3.8vw, 5.5rem);
+  --text-display-xl--line-height: 0.95;
+  --text-display-xl--letter-spacing: -0.03em;
+  --text-display-lg: clamp(2rem, 1.2rem + 2.8vw, 4rem);
+  --text-display-lg--line-height: 1;
+  --text-display-lg--letter-spacing: -0.025em;
+  --text-display-md: clamp(1.625rem, 1.1rem + 1.7vw, 2.75rem);
+  --text-display-md--line-height: 1.05;
+  --text-display-md--letter-spacing: -0.02em;
+  --text-display-sm: clamp(1.25rem, 1rem + 0.9vw, 1.875rem);
+  --text-display-sm--line-height: 1.1;
+  --text-display-sm--letter-spacing: -0.015em;
+  --text-lead: clamp(1.125rem, 1rem + 0.5vw, 1.5rem);
+  --text-lead--line-height: 1.45;
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1;
+  --text-eyebrow--letter-spacing: 0.12em;
+
+  /* Layout */
+  --container-site: 90rem; /* 1440 */
+  --spacing-gutter: 1.5rem;
+  --spacing-gutter-lg: 3rem;
+
+  /* Forma */
+  --radius-none: 0px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+
+  /* Movimento */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-base: 300ms;
+  --duration-slow: 600ms;
+
+  /* Camadas */
+  --z-nav: 50;
+  --z-overlay: 60;
+  --z-dialog: 70;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ──────────────────────────────────────────────────────────────
+   BASE
+   ────────────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+  body {
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: var(--color-azul-digital);
+    color: var(--color-bg);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent-bright);
+    outline-offset: 3px;
+    border-radius: var(--radius-xs);
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+    height: auto;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ──────────────────────────────────────────────────────────────
+   UTILITÁRIOS DO SISTEMA
+   ────────────────────────────────────────────────────────────── */
+@utility container-site {
+  width: 100%;
+  max-width: var(--container-site);
+  margin-inline: auto;
+  padding-inline: var(--spacing-gutter);
+  @media (width >= 64rem) {
+    padding-inline: var(--spacing-gutter-lg);
+  }
+}
+
+/* Tag de código — marcador de seção derivado do símbolo </> do logo */
+@utility tag-mark {
+  font-family: var(--font-sans);
+  font-size: var(--text-eyebrow);
+  letter-spacing: var(--text-eyebrow--letter-spacing);
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--color-fg-muted);
+  &::before {
+    content: "<";
+    color: var(--color-mark);
+    margin-right: 0.35em;
+  }
+  &::after {
+    content: "/>";
+    color: var(--color-mark);
+    margin-left: 0.35em;
+  }
+}
+
+/* Grade de hairlines de fundo (ver refs 27/28/36) */
+@utility hairline-grid {
+  background-image:
+    linear-gradient(to right, var(--color-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-line) 1px, transparent 1px);
+  background-size: 6rem 6rem;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
 }
