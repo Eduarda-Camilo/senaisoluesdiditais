@@ -125,6 +125,18 @@ Cases e Escala eram duas seções contando a mesma coisa — os números grandes
 
 A V2 reaproveita a coleção `SSD / Cores` e os text styles da V1, e acrescentou `Semântico/fg-body` + 6 estilos (`Mono/Meta`, `Mono/Meta SM`, `Display/XL Extrabold`, `Lead Medium`, `Heading/MD`, `Body/SM Relaxed Medium`). As imagens dos cases reaproveitam os `imageHash` já enviados na V1; a galeria do AVA foi enviada nova.
 
+**Página "V3 do site"** (node `90:324`, 24/09) — espelho do código atual para a Duda propor melhorias. Copiado do site rodando local a 1440 px, com as medidas computadas de cada elemento (não é screenshot: frames, textos editáveis, cores ligadas a `SSD / Cores`, textos ligados aos estilos existentes quando batem exatamente, ícones e marcas como componentes):
+
+| Frame | Node | Tamanho |
+|---|---|---|
+| Home — 1440 | `97:37` | 1440 × 6807 |
+| Home — estados de scroll (slides 2 e 3 dos cases, nav compacta, Sobre recolhido) | `97:38` | 1440 × 3128 |
+| Portfólio (/cases) — 1440 | `104:63` | 1440 × 5375 |
+| Case — AVA SENAI — 1440 | `104:354` | 1440 × 3744 |
+| Componentes · ícones e marcas | `98:37` | — |
+
+Seções presas no scroll (cases, Sobre) entram como um quadro de 900 px no estado de entrada. O símbolo 3D é imagem do render WebGL. WebP não decodifica no Figma: as imagens foram enviadas como PNG/JPEG.
+
 O código continua sendo a fonte de verdade; alterações feitas no Figma precisam ser trazidas de volta manualmente.
 
 ## Pendências
