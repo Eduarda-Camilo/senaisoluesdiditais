@@ -100,7 +100,7 @@ export const about = {
       text: "Nascemos em 2007, no coração de Santa Catarina, como o braço tecnológico da FIESC e do SENAI Nacional, como resposta aos desafios digitais internos e nos consolidamos como uma das principais referências em desenvolvimento de software, IA Generativa e EdTechs do país.",
     },
     {
-      title: "Solidez",
+      title: "Ecossistema",
       text: "Operamos com a solidez institucional do maior ecossistema de formação profissional da América Latina, combinada à agilidade, inovação e flexibilidade de uma software house nativa digital.",
     },
     {

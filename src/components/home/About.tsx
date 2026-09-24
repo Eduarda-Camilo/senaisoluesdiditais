@@ -9,7 +9,7 @@ import { GlobeSlot } from "./GlobeTrack";
 /**
  * Sobre nós — layout do mockup da equipe (23/09/2026).
  *
- * Título e globo à esquerda, três cartões brancos à direita (Origem, Solidez,
+ * Título e globo à esquerda, três cartões brancos à direita (Origem, Ecossistema,
  * Propósito). Comportamento da referência em vídeo (Pinnacl, "principles"): a
  * seção prende na tela com os três cartões abertos e, conforme o scroll avança,
  * o primeiro encolhe até sobrar só o cabeçalho, depois o segundo; o terceiro fica

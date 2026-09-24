@@ -31,6 +31,7 @@ export {
   RocketLaunch,
   Compass,
   TrendUp,
+  MagnifyingGlass,
 } from "@phosphor-icons/react/dist/ssr";
 
 export const ICON_SIZE = { sm: 16, md: 20, lg: 24 } as const;

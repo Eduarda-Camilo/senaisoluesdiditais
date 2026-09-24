@@ -7,6 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: site.url, lastModified: now, changeFrequency: "monthly", priority: 1 },
     { url: `${site.url}/cases`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${site.url}/vagas`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     ...cases.map((c) => ({
       url: `${site.url}/cases/${c.slug}`,
       lastModified: now,

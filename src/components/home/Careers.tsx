@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Arrow } from "@/components/ui/Button";
 import {
   ArrowUpRight,
@@ -46,15 +47,14 @@ export function Careers() {
             <p className="mt-10 lg:mt-16 max-w-[31em] text-lg lg:text-[1.375rem] leading-[1.55] text-fg">
               {careers.intro}
             </p>
-            <a
-              href={site.careersUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            {/* Vai para a página de vagas do site (não mais direto para o Pandapé). */}
+            <Link
+              href="/vagas"
               className="group mt-8 inline-flex h-14 lg:h-16 items-center gap-3 rounded-xs bg-accent px-6 lg:px-7 text-lg font-medium tracking-wide text-fg transition-colors duration-fast hover:bg-accent-hover"
             >
               Ver vagas abertas
               <Arrow className="transition-transform duration-base ease-out-quart group-hover:translate-x-0.5" />
-            </a>
+            </Link>
           </div>
 
           <div className="min-w-0">
