@@ -41,6 +41,9 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     siteName: site.name,
   },
+  icons: {
+    icon: "/icon.svg",
+  },
   robots: { index: true, follow: true },
 };
 
