@@ -1,4 +1,4 @@
-import type { Case } from "./types";
+import type { Case, CaseImage } from "./types";
 
 /**
  * 16 cases da revista de projetos + 4 do site atual (resumidos).
@@ -39,6 +39,7 @@ export const cases: Case[] = [
       { role: "Designer", count: 1 },
     ],
     cover: { src: "/cases/ava-senai/cover.png", width: 2388, height: 2787, alt: "Mosaico de telas do AVA SENAI: painel do aluno, cursos e atividades" },
+    hero: { src: "/cases/ava-senai/detalhe.webp", width: 2304, height: 2547, alt: "Mosaico de telas do AVA SENAI: login, avaliações, cursos e perfil do aluno" },
     gallery: [
       { src: "/cases/ava-senai/g1.png", width: 493, height: 522, alt: "AVA SENAI em celulares" },
       { src: "/cases/ava-senai/g2.png", width: 540, height: 275, alt: "Tela Meus Cursos do AVA SENAI" },
@@ -616,6 +617,87 @@ export const cases: Case[] = [
     source: "site-atual",
   },
 ];
+
+/**
+ * Ordem da página /cases e do anterior/próximo do detalhe — a do design V3
+ * (Figma "V3 do site" › "Portfólio (/cases) — 1442", node 125:317): os cases
+ * com material visual primeiro, os sem imagem no fim.
+ */
+const designOrder = [
+  "ava-senai",
+  "espaco-do-estudante",
+  "e-commerce",
+  "orbie",
+  "nr-10",
+  "habilita",
+  "seif",
+  "saep-ia",
+  "devstart",
+  "crm",
+  "senai-space",
+  "eleva",
+  "itinerarios-nacionais",
+  "lab-digital",
+  "audioxp",
+  "dw",
+  "sgn",
+  "chatbot-sgn",
+  "hub-ia",
+  "predicao-evasao",
+];
+
+export const casesInOrder: Case[] = designOrder.map((slug) => cases.find((c) => c.slug === slug)!);
+
+/**
+ * Imagem do card de cada case, exportada do design V3 (mesmo frame acima).
+ *
+ * `card.webp` é a faixa direita do card de 283px de altura, recortada do começo
+ * da composição de telas até a borda do card (@2x). Foi exportada sobre o
+ * surface-2, então é opaca e só funciona sobre esse fundo. O número é a largura
+ * do recorte em px @1x: é ela que cola a imagem à direita na mesma posição do
+ * design.
+ *
+ * Os cases sem material visual usam o símbolo 3D (`sem-foto.webp`), como no design.
+ */
+const cardWidths: Record<string, number> = {
+  "ava-senai": 509,
+  "espaco-do-estudante": 342,
+  "e-commerce": 498,
+  orbie: 410,
+  "nr-10": 394,
+  habilita: 487,
+  seif: 485,
+  "saep-ia": 539,
+  devstart: 442,
+  crm: 474,
+  "senai-space": 317,
+  eleva: 472,
+  "itinerarios-nacionais": 430,
+  "lab-digital": 400,
+  audioxp: 360,
+};
+
+export const CARD_HEIGHT = 283;
+
+export function caseCard(c: Case): CaseImage & { placeholder: boolean } {
+  const width = cardWidths[c.slug];
+  if (!width) {
+    return { src: "/cases/sem-foto.webp", width: 410, height: CARD_HEIGHT, alt: "", placeholder: true };
+  }
+  return { src: `/cases/${c.slug}/card.webp`, width, height: CARD_HEIGHT, alt: `Telas do ${c.name}`, placeholder: false };
+}
+
+/**
+ * Imagem grande do detalhe (quadro de 1344 × 620). Vem da seção "Images Case
+ * detail" do Figma (node 168:10796), exportada a 2× com o recorte do design;
+ * o AVA usa o mosaico do próprio design do detalhe (`hero`). Cases sem material
+ * visual não têm imagem — o detalhe some com o quadro.
+ */
+export function caseDetailImage(c: Case): CaseImage | null {
+  if (c.hero) return c.hero;
+  if (!cardWidths[c.slug]) return null;
+  return { src: `/cases/${c.slug}/detalhe.webp`, width: 2688, height: 1240, alt: `Telas do ${c.name}` };
+}
 
 export const featuredCases = cases.filter((c) => c.tier === "editorial");
 

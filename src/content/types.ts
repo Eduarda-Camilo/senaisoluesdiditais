@@ -57,6 +57,8 @@ export interface Case {
   startDate?: string; // ISO yyyy-mm-dd
   status?: "piloto" | "em-desenvolvimento";
   cover?: CaseImage;
+  /** Mosaico do design do detalhe do AVA (tem proporção própria). Os outros cases usam `caseDetailImage`. */
+  hero?: CaseImage;
   gallery?: CaseImage[];
   logo?: { src: string; width: number; height: number };
   /** Origem do conteúdo, para rastreabilidade. */
@@ -67,8 +69,8 @@ export interface Capability {
   slug: CapabilitySlug;
   index: string; // "01".."06"
   name: string;
-  /** Pergunta do cliente que essa capacidade responde. */
-  problem: string;
+  /** Descrição curta do serviço, montada só a partir de `offer`. */
+  description: string;
   /** O que a SSD faz (do material). */
   offer: string[];
   /** Evidência: slugs de cases. */

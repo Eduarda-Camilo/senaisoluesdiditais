@@ -23,16 +23,14 @@ export default async function CasesPage({ searchParams }: PageProps<"/cases">) {
     | Segment
     | undefined;
 
+  // Design V3 (Figma "Portfólio (/cases) — 1442", node 125:317).
   return (
-    <div className="container-site pt-12 pb-24 lg:pt-20">
-      <Reveal className="mb-14 lg:mb-20 flex flex-col gap-5 max-w-3xl">
-        <p className="tag-mark">cases · índice completo</p>
-        <h1 className="font-display font-bold text-display-lg">
-          {cases.length} produtos, seis capacidades, um critério: o que aconteceu depois.
+    <div className="container-site pt-8 pb-20">
+      <Reveal className="mb-12 flex flex-col gap-6">
+        <p className="meta text-fg">cases</p>
+        <h1 className="font-display font-extrabold text-[clamp(2.5rem,1.4rem+3.8vw,4.82rem)] leading-[0.9] tracking-[-0.03em]">
+          Nossos cases
         </h1>
-        <p className="text-lead text-fg-muted font-light">
-          Todos os produtos documentados, com números quando existem e sem números quando não existem.
-        </p>
       </Reveal>
       <CasesExplorer initialCapability={initialCapability} initialSegment={initialSegment} />
     </div>

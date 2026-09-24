@@ -9,6 +9,7 @@ import {
 import { Reveal } from "@/components/ui/Reveal";
 import { careers, site } from "@/content/site";
 import { CareersCarousel } from "./CareersCarousel";
+import { GlobeEnd } from "./GlobeTrack";
 
 /**
  * Trabalhe conosco — mockup da equipe (24/09).
@@ -29,7 +30,8 @@ const perkIcons = [GlobeHemisphereWest, RocketLaunch, Compass, TrendUp];
 export function Careers() {
   return (
     <section id="carreiras" aria-labelledby="carreiras-titulo" className="scroll-mt-16 overflow-clip">
-      <div className="bg-bg text-fg pt-24 pb-14 lg:pt-24 lg:pb-12">
+      {/* Sem fundo próprio (o do body é preto): o globo 3D passa por trás — ver GlobeTrack. */}
+      <div data-globe-band className="text-fg pt-24">
         <div className="container-site grid grid-cols-[minmax(0,1fr)] items-start gap-12 lg:grid-cols-[minmax(0,692fr)_minmax(0,586fr)] lg:gap-x-16">
           <div>
             <h2
@@ -55,7 +57,17 @@ export function Careers() {
             </a>
           </div>
 
-          <CareersCarousel />
+          <div className="min-w-0">
+            <CareersCarousel />
+            {/* Fim da travessia do globo: a cúpula e o "Vem ser FIESC", cortados
+                pela faixa branca (referência de 24/09). */}
+            <div className="bleed-right relative mt-11 h-[calc(var(--globe-end)*0.19)] overflow-hidden [--globe-end:90vw] lg:[--globe-end:min(52.5vw,47.3rem)]">
+              <GlobeEnd className="absolute top-0 left-1/2 w-(--globe-end) -translate-x-1/2" />
+              <p className="absolute bottom-0 left-0 translate-y-[18%] whitespace-nowrap font-display font-extrabold uppercase leading-none tracking-[-0.045em] text-[clamp(2rem,3.9vw,3.5rem)]">
+                Vem ser FIESC
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 

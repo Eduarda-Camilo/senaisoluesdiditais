@@ -13,7 +13,7 @@ import { cn } from "@/lib/cn";
  * Navegação principal.
  *
  * Mockup da equipe (23/09): no topo da página a barra ocupa a largura do
- * container — símbolo à esquerda, links no centro, "Fale conosco" à direita.
+ * container — símbolo à esquerda, links no centro, "Contato" à direita (era "Fale conosco"; renomeado em 24/09).
  * Ao rolar, o símbolo e o botão deslizam para junto dos links e o conjunto vira
  * uma barra preta compacta, centralizada e flutuando a 8px do topo (591 × 58 no
  * mockup), com links em branco e o botão sólido branco.
@@ -167,7 +167,7 @@ export function Nav() {
                   : "h-10 px-4 rounded-xs border-line-strong hover:border-fg",
               )}
             >
-              Fale conosco
+              Contato
             </Link>
 
             <Dialog.Root open={open} onOpenChange={setOpen}>
@@ -211,7 +211,7 @@ export function Nav() {
                         className="flex items-baseline gap-4 py-5 font-display text-2xl font-semibold text-accent-bright"
                       >
                         <span className="meta text-fg-faint">05</span>
-                        Fale conosco
+                        Contato
                       </Link>
                     </li>
                   </ul>

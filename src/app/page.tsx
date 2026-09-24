@@ -3,6 +3,7 @@ import { Careers } from "@/components/home/Careers";
 import { CasesScene } from "@/components/home/CasesScene";
 import { Contact } from "@/components/home/Contact";
 import { Hero } from "@/components/home/Hero";
+import { GlobeTrack } from "@/components/home/GlobeTrack";
 import { Services } from "@/components/home/Services";
 
 /**
@@ -20,9 +21,12 @@ export default function HomePage() {
     <>
       <Hero />
       <CasesScene />
-      <Services />
-      <About />
-      <Careers />
+      {/* O globo atravessa as três seções e termina no Trabalhe conosco. */}
+      <GlobeTrack>
+        <Services />
+        <About />
+        <Careers />
+      </GlobeTrack>
       <Contact />
     </>
   );

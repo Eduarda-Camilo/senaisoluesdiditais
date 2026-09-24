@@ -7,6 +7,7 @@ import { ArrowUpRight } from "@/components/ui/icons";
 import { capabilities } from "@/content/capabilities";
 import { cases } from "@/content/cases";
 import { cn } from "@/lib/cn";
+import { GlobeAnchor } from "./GlobeTrack";
 
 /**
  * Serviços.
@@ -15,8 +16,8 @@ import { cn } from "@/lib/cn";
  * O nome do serviço é o elemento tipográfico da seção — por isso ocupa a linha
  * inteira, sem índice numérico à esquerda e sem contador (ref studiors).
  *
- * O que continua resolvendo os feedbacks #2/#9/#10: cada serviço se explica pela
- * pergunta que o cliente faz, e o CTA leva ao portfólio já filtrado.
+ * O serviço em destaque mostra uma descrição curta do que ele entrega (de
+ * `capabilities.ts`) e o CTA leva ao portfólio já filtrado.
  *
  * Os numerais `01`–`06` continuam existindo em `capabilities.ts` e aparecem em
  * /cases; aqui eles saíram porque disputavam atenção com o título.
@@ -47,13 +48,16 @@ export function Services() {
   }, [reduce]);
 
   return (
-    <section id="servicos" aria-labelledby="servicos-titulo" className="scroll-mt-16 py-20 lg:py-24">
+    <section id="servicos" aria-labelledby="servicos-titulo" className="relative scroll-mt-16 py-20 lg:py-24">
+      {/* O globo 3D parte daqui — ver GlobeTrack. */}
+      <GlobeAnchor />
       <div className="container-site">
-        <h2 id="servicos-titulo" className="font-display font-bold text-display-lg">
+        {/* Mesmo estilo de título do Sobre nós, Trabalhe conosco e Fale conosco. */}
+        <h2 id="servicos-titulo" className="font-display font-extrabold text-[clamp(3rem,1rem+4.5vw,4.625rem)] leading-[0.9]">
           Serviços
         </h2>
 
-        <ol className="mt-14 lg:mt-20 border-t border-line">
+        <ol className="mt-14 lg:mt-20">
           {capabilities.map((cap, i) => {
             const isActive = reduce || i === active;
             const count = cap.cases.filter((s) => cases.some((c) => c.slug === s)).length;
@@ -63,7 +67,7 @@ export function Services() {
                 ref={(el) => {
                   refs.current[i] = el;
                 }}
-                className="border-b border-line py-8 lg:py-12"
+                className="py-8 lg:py-12"
               >
                 <h3
                   className={cn(
@@ -86,7 +90,7 @@ export function Services() {
                   <div className="overflow-hidden">
                     <div className="pt-6 flex flex-col gap-5">
                       <p className="text-fg-body text-base lg:text-lg leading-relaxed max-w-[52ch]">
-                        &ldquo;{cap.problem}&rdquo;
+                        {cap.description}
                       </p>
                       <Link
                         href={`/cases?capacidade=${cap.slug}`}

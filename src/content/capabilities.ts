@@ -3,13 +3,17 @@ import type { Capability } from "./types";
 /**
  * Taxonomia única de capacidades. Consolida os 11 chips + 6 especialidades do site atual
  * e os 9 serviços da página /aws.html. Cada capacidade aponta para os cases que a comprovam.
+ *
+ * `description` resume o serviço só com o que está em `offer` (pedido de 24/09: a
+ * frase "na voz do cliente" que existia antes era simulada e saiu).
  */
 export const capabilities: Capability[] = [
   {
     slug: "plataformas",
     index: "01",
     name: "Plataformas e sistemas",
-    problem: "Preciso de um sistema que sustente uma operação inteira — com milhares de usuários, integrações e continuidade.",
+    description:
+      "Plataformas web e sistemas de gestão de ponta a ponta, integrados aos sistemas corporativos, com autenticação única e perfis de acesso — inclusive o redesign e a modernização de produtos em operação.",
     offer: [
       "Plataformas web e sistemas de gestão de ponta a ponta",
       "Integração entre sistemas corporativos (SGN, AVA, CRM, e-commerce)",
@@ -22,7 +26,8 @@ export const capabilities: Capability[] = [
     slug: "ia",
     index: "02",
     name: "Inteligência artificial aplicada",
-    problem: "Tenho um processo repetitivo e especializado que consome tempo de gente qualificada.",
+    description:
+      "IA generativa para produção de conteúdo técnico e pedagógico, recomendação e personalização, análise preditiva e chatbots e assistentes baseados em documentos.",
     offer: [
       "IA generativa para produção de conteúdo técnico e pedagógico",
       "Recomendação e personalização",
@@ -35,7 +40,8 @@ export const capabilities: Capability[] = [
     slug: "mobile",
     index: "03",
     name: "Aplicativos móveis",
-    problem: "Meus usuários estão em campo, na escola ou na fábrica — não na frente de um computador.",
+    description:
+      "Apps Android e iOS conectados às plataformas web existentes, incluindo experiências de realidade aumentada em dispositivos móveis.",
     offer: [
       "Apps Android e iOS",
       "Experiências conectadas a plataformas web existentes",
@@ -47,7 +53,8 @@ export const capabilities: Capability[] = [
     slug: "dados",
     index: "04",
     name: "Dados e analytics",
-    problem: "Os dados existem, mas estão espalhados em fontes que não conversam.",
+    description:
+      "Data warehouse e integração de fontes, pipelines automatizados e processamento de big data, painéis de BI e monitoramento e modelos de machine learning versionados.",
     offer: [
       "Data warehouse e integração de fontes",
       "Pipelines automatizados e processamento de big data",
@@ -60,7 +67,8 @@ export const capabilities: Capability[] = [
     slug: "imersivo",
     index: "05",
     name: "Realidade virtual, aumentada e simulação",
-    problem: "O treinamento é perigoso, caro ou impossível de reproduzir em sala de aula.",
+    description:
+      "Simuladores em realidade virtual e mista, objetos 3D interativos em realidade aumentada, bancadas virtuais conectadas a equipamentos reais e modelagem e animação 3D.",
     offer: [
       "Simuladores em realidade virtual e mista",
       "Objetos 3D interativos em realidade aumentada",
@@ -73,7 +81,8 @@ export const capabilities: Capability[] = [
     slug: "cloud",
     index: "06",
     name: "Cloud e DevOps na AWS",
-    problem: "Preciso migrar, modernizar ou escalar uma aplicação com segurança e sem parar a operação.",
+    description:
+      "Arquitetura de soluções escaláveis, seguras e resilientes na AWS, migração e modernização de aplicações para a nuvem, pipelines de CI/CD e práticas DevOps, containers, bancos gerenciados e observabilidade.",
     offer: [
       "Arquitetura de soluções escaláveis, seguras e resilientes",
       "Migração e modernização de aplicações para a nuvem",

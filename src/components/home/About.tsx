@@ -4,11 +4,12 @@ import { useReducedMotion } from "motion/react";
 import { useEffect, useRef } from "react";
 import { about } from "@/content/site";
 import { cn } from "@/lib/cn";
+import { GlobeSlot } from "./GlobeTrack";
 
 /**
  * Sobre nós — layout do mockup da equipe (23/09/2026).
  *
- * Título e foto à esquerda, três cartões brancos à direita (Origem, Solidez,
+ * Título e globo à esquerda, três cartões brancos à direita (Origem, Solidez,
  * Propósito). Comportamento da referência em vídeo (Pinnacl, "principles"): a
  * seção prende na tela com os três cartões abertos e, conforme o scroll avança,
  * o primeiro encolhe até sobrar só o cabeçalho, depois o segundo; o terceiro fica
@@ -29,7 +30,8 @@ import { cn } from "@/lib/cn";
  * Abaixo de `lg`, ou com prefers-reduced-motion, os cartões ficam abertos e a
  * seção rola normalmente.
  *
- * FOTO: placeholder até a equipe mandar a imagem.
+ * No lugar da foto da equipe fica o globo 3D, que chega de Serviços com o
+ * scroll (referência de 24/09) — ver GlobeTrack.
  */
 
 /** Distância de scroll com o quadro preso, em alturas de tela. */
@@ -150,14 +152,15 @@ export function About() {
   }, [reduce]);
 
   return (
-    <section ref={sectionRef} id="sobre" aria-labelledby="sobre-titulo" className="relative scroll-mt-16 bg-bg text-fg">
-      <div ref={frameRef}>
+    <section ref={sectionRef} id="sobre" aria-labelledby="sobre-titulo" className="relative scroll-mt-16 text-fg">
+      {/* Sem fundo próprio: o globo (camada atrás, GlobeTrack) precisa aparecer. */}
+      <div ref={frameRef} data-globe-frame>
         <div className="container-site py-20 lg:py-24 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,591fr)_minmax(0,661fr)] lg:gap-x-20">
           <div className="flex flex-col gap-10 lg:justify-between">
             <h2 id="sobre-titulo" className="font-display font-extrabold text-[clamp(3rem,1rem+4.5vw,4.625rem)] leading-[0.9]">
               Sobre nós
             </h2>
-            <PhotoPlaceholder />
+            <GlobeSlot className="w-full max-w-[26rem] mx-auto lg:mx-0 lg:max-w-none lg:w-(--globe) lg:-ml-12" />
           </div>
 
           <div ref={columnRef}>
@@ -199,19 +202,5 @@ export function About() {
       </div>
       <div ref={spacerRef} aria-hidden="true" style={{ height: 0 }} />
     </section>
-  );
-}
-
-/** Lugar da foto da equipe — mesma proporção da imagem do mockup (591 × 549). */
-function PhotoPlaceholder() {
-  return (
-    <div
-      role="img"
-      aria-label="Foto da equipe (pendente)"
-      className="relative aspect-[591/549] w-full bg-surface-2 border border-line flex items-center justify-center overflow-hidden"
-    >
-      <div aria-hidden="true" className="hairline-diagonal absolute inset-0 text-fg/6" />
-      <p className="relative meta text-fg-faint">[foto da equipe pendente]</p>
-    </div>
   );
 }

@@ -35,11 +35,11 @@ export const site = {
     email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "solucoesdigitais@sc.senai.br",
     emailPending: false,
     /**
-     * PENDENTE. O mockup traz "+55 (48) 91111-1111", que é número de preenchimento
-     * (o assinante é 1111-1111), não um telefone real — publicar isso seria pior
-     * que o placeholder. Assim que a equipe passar o número, entra aqui.
+     * FICTÍCIO — pedido da equipe em 24/09 para a apresentação: um número de Santa
+     * Catarina (DDD 48) no formato do mockup. PENDENTE: trocar pelo número real
+     * antes de publicar de verdade.
      */
-    phone: "",
+    phone: "+55 (48) 91111-1111",
     address: "", // PENDENTE
   },
 

@@ -1,17 +1,17 @@
 "use client";
 
-import Image from "next/image";
 import { useState, type FormEvent } from "react";
 import { ArrowRight, ArrowUpRight, Copy } from "@/components/ui/icons";
 import { Reveal } from "@/components/ui/Reveal";
 import { site } from "@/content/site";
 
 /**
- * Fale conosco.
+ * Entre em contato (era "Fale conosco"; renomeado em 24/09, junto com o botão da
+ * Nav, que virou "Contato").
  *
  * Layout do mockup da equipe (versão 3, 23/09/2026): fundo preto, título grande
- * em duas linhas, contato direto à esquerda — sem cartão, só o conteúdo com o
- * recuo que o cartão tinha —, formulário com rótulos visíveis à direita e o
+ * em duas linhas, contato direto à esquerda — sem cartão, alinhado ao título e
+ * ao topo do formulário (referência de 24/09, sem o símbolo do SD em cima) —, formulário com rótulos visíveis à direita e o
  * símbolo do SD em contorno ao fundo, continuando por baixo do rodapé.
  *
  * Como o contorno atravessa o rodapé: o `Backdrop` é absoluto e se estende bem
@@ -25,8 +25,9 @@ import { site } from "@/content/site";
  *
  * A submissão continua sendo um mailto: preenchido (decisão da equipe).
  *
- * CONTEÚDO: o telefone do mockup é número de preenchimento e não foi publicado —
- * ver `site.contact`. As redes saem de `site.social`; o mockup pede YouTube, que
+ * CONTEÚDO: o telefone é FICTÍCIO (pedido da equipe em 24/09, para a
+ * apresentação) — ver `site.contact`. Sai como texto, sem link `tel:`, para
+ * ninguém ligar para um número que pode ser de alguém. As redes saem de `site.social`; o mockup pede YouTube, que
  * não temos URL, então aparecem as três que existem.
  */
 const fieldCls =
@@ -75,9 +76,9 @@ export function Contact() {
             id="contato-titulo"
             className="font-display font-extrabold text-[clamp(3rem,1rem+4.5vw,4.625rem)] leading-[0.92]"
           >
-            Fale
+            Entre em
             <br />
-            conosco
+            contato
           </h2>
           <p className="text-lg leading-relaxed text-fg">
             Tem uma ideia, um projeto ou uma necessidade digital?
@@ -87,22 +88,10 @@ export function Contact() {
 
         <div className="mt-10 lg:mt-14 grid gap-12 lg:grid-cols-[minmax(0,572fr)_minmax(0,652fr)] lg:gap-x-30">
           <Reveal className="flex">
-            <div className="w-full lg:p-6 flex flex-col items-start justify-between gap-12">
-              <Image
-                src="/brand/sd-simbolo-branco.svg"
-                alt=""
-                width={122}
-                height={145}
-                className="h-8 w-auto"
-              />
-
+            <div className="w-full flex flex-col items-start gap-12 lg:gap-16">
               <div className="flex flex-col gap-2">
                 <h3 className="text-xl font-semibold mb-2">Contato</h3>
-                <p className="text-xl">
-                  {site.contact.phone || (
-                    <span className="text-fg-faint">[telefone pendente]</span>
-                  )}
-                </p>
+                <p className="text-xl">{site.contact.phone}</p>
                 {/* No celular o e-mail cai para 16px: é o maior corpo em que ele e o
                     botão de copiar cabem juntos numa linha a 360px. */}
                 <p className="flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-1">
