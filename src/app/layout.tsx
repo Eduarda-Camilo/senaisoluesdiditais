@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Syne, Space_Grotesk } from "next/font/google";
+import { Syne, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { site } from "@/content/site";
@@ -17,6 +17,14 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-space-grotesk",
+  display: "swap",
+});
+
+// Mono só nos pesos que a UI usa — rótulo (400) e numeral de índice (500).
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-jetbrains-mono",
   display: "swap",
 });
 
@@ -43,7 +51,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" className={`${syne.variable} ${spaceGrotesk.variable} h-full`}>
+    <html
+      lang="pt-BR"
+      className={`${syne.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full`}
+    >
       <body className="min-h-full flex flex-col">
         <a
           href="#conteudo"
@@ -52,10 +63,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Ir para o conteúdo
         </a>
         <Nav />
-        <main id="conteudo" className="flex-1">
-          {children}
-        </main>
-        <Footer />
+        {/* `overflow-clip` corta o fundo do Fale conosco, que desce por baixo do
+            rodapé (ver home/Contact.tsx). `clip` não cria contêiner de rolagem,
+            então o `sticky` da cena de cases continua funcionando. */}
+        <div className="flex flex-1 flex-col overflow-clip">
+          <main id="conteudo" className="flex-1">
+            {children}
+          </main>
+          <Footer />
+        </div>
       </body>
     </html>
   );

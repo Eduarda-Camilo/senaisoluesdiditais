@@ -7,25 +7,27 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { capabilities } from "@/content/capabilities";
 import { cases } from "@/content/cases";
+import { segments } from "@/content/segments";
 import type { CapabilitySlug, Segment } from "@/content/types";
 import { CapabilityChips } from "./CapabilityChips";
 import { StatusLabel } from "./StatusLabel";
 import { cn } from "@/lib/cn";
 import { pad } from "@/lib/format";
 
-const segments: { value: Segment; label: string }[] = [
-  { value: "educacao", label: "Educação" },
-  { value: "industria", label: "Indústria" },
-  { value: "gestao", label: "Gestão" },
-  { value: "sst", label: "Segurança do trabalho" },
-];
-
 const toggleCls =
   "h-9 px-3 text-sm rounded-xs border border-line text-fg-muted hover:text-fg hover:border-line-strong data-pressed:bg-fg data-pressed:text-bg data-pressed:border-fg transition-colors select-none";
 
-export function CasesExplorer() {
-  const [cap, setCap] = useState<CapabilitySlug[]>([]);
-  const [seg, setSeg] = useState<Segment[]>([]);
+export function CasesExplorer({
+  initialCapability,
+  initialSegment,
+}: {
+  initialCapability?: CapabilitySlug;
+  initialSegment?: Segment;
+}) {
+  // Chega pré-filtrado quando o visitante vem do CTA de uma capacidade ou de um
+  // chip de setor na home.
+  const [cap, setCap] = useState<CapabilitySlug[]>(initialCapability ? [initialCapability] : []);
+  const [seg, setSeg] = useState<Segment[]>(initialSegment ? [initialSegment] : []);
 
   const list = useMemo(
     () =>

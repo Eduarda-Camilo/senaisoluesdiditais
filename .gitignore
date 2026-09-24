@@ -39,3 +39,22 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Portable generated directories
+node_modules/
+.next/
+out/
+.vercel/
+
+# Environment variables (keep the example versionable)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+# Additional logs and macOS metadata
+pnpm-debug.log*
+__MACOSX/
+._*

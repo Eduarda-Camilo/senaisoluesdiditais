@@ -25,9 +25,9 @@ export function Section({
 }) {
   const headingId = `${id}-titulo`;
   return (
-    <section id={id} aria-labelledby={headingId} className={cn("scroll-mt-16 py-24 lg:py-32", className)}>
+    <section id={id} aria-labelledby={headingId} className={cn("scroll-mt-16 py-20 lg:py-24", className)}>
       <div className="container-site">
-        <div className="grid gap-8 lg:grid-cols-12 lg:gap-12 mb-14 lg:mb-20">
+        <div className="grid gap-8 lg:grid-cols-12 lg:gap-12 mb-10 lg:mb-14">
           <Reveal className="lg:col-span-7 flex flex-col gap-5">
             <p className="tag-mark">{tag}</p>
             <h2 id={headingId} className="font-display font-bold text-display-lg max-w-[16ch]">

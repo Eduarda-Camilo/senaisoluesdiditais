@@ -12,7 +12,7 @@ export function CapabilityChips({ slugs, className, linked = true }: { slugs: Ca
         <li key={c!.slug} className="flex items-center gap-1.5">
           <span className="text-mark tabular">{c!.index}</span>
           {linked ? (
-            <Link href={`/#cap-${c!.slug}`} className="hover:text-fg transition-colors">
+            <Link href={`/cases?capacidade=${c!.slug}`} className="hover:text-fg transition-colors">
               {c!.name}
             </Link>
           ) : (

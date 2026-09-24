@@ -30,16 +30,24 @@
   --color-line: rgb(255 255 255 / 0.12);
   --color-line-strong: rgb(255 255 255 / 0.24);
   --color-fg: #ffffff;
+  /* Corpo de leitura. O muted era claro o bastante em contraste, mas "apagava"
+     em texto corrido sobre preto (feedback #3). Reservado para meta e legenda. */
+  --color-fg-body: #d4d7db;
   --color-fg-muted: #a3a8ae;
   --color-fg-faint: #6e7278;
   --color-accent: #0574d9;
   --color-accent-hover: #2a99ff;
   --color-accent-bright: #00bcff;
   --color-mark: #e84910;
+  /* Tom intermediário do arco preto → laranja do Hero (ver `bg-arc`). */
+  --color-ember: #641d07;
 
   /* Tipografia */
   --font-display: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  /* Mono: rótulos, numerais de índice, unidades e metadados de ficha técnica.
+     É o que sustenta a leitura de "dossiê" — ver docs/DIRECAO-V2.md §4.1. */
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono", monospace;
 
   /* Escala fluida (min @ 360px → max @ 1440px) */
   --text-display-xl: clamp(2.5rem, 1.4rem + 3.8vw, 5.5rem);
@@ -59,6 +67,12 @@
   --text-eyebrow: 0.75rem;
   --text-eyebrow--line-height: 1;
   --text-eyebrow--letter-spacing: 0.12em;
+  --text-meta: 0.6875rem; /* 11px — rótulos mono */
+  --text-meta--line-height: 1.2;
+  --text-meta--letter-spacing: 0.08em;
+  --text-meta-sm: 0.625rem; /* 10px — rails e numerais de apoio */
+  --text-meta-sm--line-height: 1.2;
+  --text-meta-sm--letter-spacing: 0.1em;
 
   /* Layout */
   --container-site: 90rem; /* 1440 */
@@ -73,6 +87,8 @@
   /* Movimento */
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: linear(0, 0.4 12%, 0.9 25%, 1.06 40%, 0.99 64%, 1);
+  --duration-micro: 90ms; /* feedback de toque */
   --duration-fast: 150ms;
   --duration-base: 300ms;
   --duration-slow: 600ms;
@@ -166,6 +182,53 @@
   }
 }
 
+/* Rótulo mono — substitui o eyebrow em meta, índices e unidades. */
+@utility meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  line-height: var(--text-meta--line-height);
+  letter-spacing: var(--text-meta--letter-spacing);
+  text-transform: uppercase;
+}
+
+/* Rótulo mono grande — o "nossos cases" da cena laranja (16px, pedido de 23/09). */
+@utility meta-lg {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@utility meta-sm {
+  font-family: var(--font-mono);
+  font-size: var(--text-meta-sm);
+  line-height: var(--text-meta-sm--line-height);
+  letter-spacing: var(--text-meta-sm--letter-spacing);
+  text-transform: uppercase;
+}
+
+/* Grade ortogonal fina — fundo da cena de cases, sobre o laranja.
+   A cor vem de `currentColor`, então o mesmo utilitário serve em qualquer fundo.
+   Malha de 6rem (era 8.75rem): quadrados menores, pedido da equipe em 23/09. */
+@utility grid-lines {
+  background-image:
+    linear-gradient(to right, currentColor 1px, transparent 1px),
+    linear-gradient(to bottom, currentColor 1px, transparent 1px);
+  background-size: 6rem 6rem;
+}
+
+/* Hairlines diagonais atravessando a seção — textura sem glow (ref Pinnacl). */
+@utility hairline-diagonal {
+  background-image: repeating-linear-gradient(
+    -24deg,
+    transparent 0,
+    transparent 7.5rem,
+    currentColor 7.5rem,
+    currentColor calc(7.5rem + 1px)
+  );
+}
+
 /* Grade de hairlines de fundo (ver refs 27/28/36) */
 @utility hairline-grid {
   background-image:
@@ -175,6 +238,77 @@
   mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
 }
 
+/* ──────────────────────────────────────────────────────────────
+   ARCO DO HERO (pedido de 23/09: o gradiente "forma um arco" para a
+   seção seguinte).
+   Uma elipse centrada na borda de baixo do Hero: laranja no centro,
+   escurecendo para as laterais e para cima até o preto. A cena de
+   cases continua com `bg-arc-tail`, que é a MESMA elipse lida na
+   linha do centro (um degradê horizontal com as mesmas paradas) e
+   desbota para o laranja chapado. Como a borda entre as duas seções
+   é exatamente a linha do centro da elipse, as cores batem pixel a
+   pixel na junção.
+   ────────────────────────────────────────────────────────────── */
+:root {
+  --arc-rx: max(130vw, 42rem); /* raio horizontal: quanto maior, mais suave o arco */
+  --arc-ry: 62svh; /* raio vertical: onde o preto começa, medido da base do Hero */
+}
+
+@utility bg-arc {
+  background: radial-gradient(
+    var(--arc-rx) var(--arc-ry) at 50% 100%,
+    var(--color-mark) 0%,
+    var(--color-ember) 35%,
+    #000 100%
+  );
+}
+
+@utility bg-arc-tail {
+  background: linear-gradient(
+    to right,
+    #000 calc(50% - var(--arc-rx)),
+    var(--color-ember) calc(50% - 0.35 * var(--arc-rx)),
+    var(--color-mark) 50%,
+    var(--color-ember) calc(50% + 0.35 * var(--arc-rx)),
+    #000 calc(50% + var(--arc-rx))
+  );
+  mask-image: linear-gradient(to bottom, #000, transparent);
+}
+
 @utility tabular {
   font-variant-numeric: tabular-nums;
+}
+
+/* Entrada do painel na troca de capacidade/aba. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Sangra até a borda direita da tela a partir de uma coluna do container-site
+   (fotos do Trabalhe conosco). Acima de 1440 soma a margem do container. */
+@utility bleed-right {
+  margin-right: calc(-1 * var(--spacing-gutter));
+  @media (width >= 64rem) {
+    margin-right: calc(
+      -1 * max(var(--spacing-gutter-lg), (100vw - var(--container-site)) / 2 + var(--spacing-gutter-lg))
+    );
+  }
+}
+
+/* Preenchimento do indicador do carrossel — a própria animação é o temporizador
+   (o `animationend` troca a foto), então pausar é só pausar a animação. */
+@keyframes carousel-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
