@@ -28,8 +28,8 @@ import { cn } from "@/lib/cn";
  * é transparente a cliques: só a barra recebe ponteiro, para a faixa vazia dos
  * lados não bloquear o conteúdo que passa por baixo.
  *
- * Abaixo de `md` não há links na barra (ficam no menu lateral); lá ela segue
- * sendo uma faixa de largura cheia que ganha fundo ao rolar.
+ * Abaixo de `md` não há links na barra (ficam no menu lateral); lá ela é uma
+ * faixa transparente com o símbolo e o botão do menu (fundo preto próprio).
  */
 
 const links = [
@@ -93,13 +93,10 @@ export function Nav() {
 
   return (
     <header
-      className={cn(
-        "sticky top-0 z-(--z-nav) h-16 pointer-events-none border-b transition-colors duration-base",
-        // Faixa com fundo só no celular; no desktop quem tem fundo é a barra compacta.
-        scrolled && !wide
-          ? "bg-bg/85 backdrop-blur-md border-line"
-          : "bg-transparent border-transparent",
-      )}
+      // Transparente também no celular (pedido de 25/09): a faixa escura por cima
+      // das seções saiu. Quem garante a leitura é o botão do menu, com fundo
+      // próprio; no desktop quem tem fundo é a barra compacta.
+      className="sticky top-0 z-(--z-nav) h-16 pointer-events-none"
     >
       <div className="container-site h-full flex justify-center items-start">
         <motion.nav
@@ -173,7 +170,7 @@ export function Nav() {
 
             <Dialog.Root open={open} onOpenChange={setOpen}>
               <Dialog.Trigger
-                className="md:hidden inline-flex size-10 items-center justify-center rounded-xs border border-line-strong"
+                className="md:hidden inline-flex size-10 items-center justify-center rounded-xs border border-line-strong bg-bg"
                 aria-label="Abrir menu"
               >
                 <List size={20} aria-hidden="true" />

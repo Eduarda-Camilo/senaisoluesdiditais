@@ -11,7 +11,9 @@ import { site } from "@/content/site";
  * 188:21611 o hover do logotipo; reorganizado no mesmo dia para o logotipo
  * conviver com o mapa do site.
  *
- * Uma linha só: o símbolo do SD à esquerda e o mapa do site à direita. Ao passar
+ * Uma linha só: o símbolo do SD à esquerda e o mapa do site à direita. A base
+ * (linha, direitos, política e o nome grande) fica fora do container: ocupa a
+ * largura da tela menos as margens laterais, em qualquer tamanho. Ao passar
  * o mouse (ou focar pelo teclado), "SENAI / SOLUÇÕES DIGITAIS" saem de dentro do
  * símbolo. A coluna do logotipo já reserva a largura dele aberto, então as
  * colunas não se mexem — só o logotipo anima. A largura do link anima com
@@ -99,7 +101,7 @@ export function Footer() {
         // O conteúdo é estático e vem de content/site.ts.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }}
       />
-      <div className="container-site pt-12 pb-12 lg:pt-16">
+      <div className="container-site pt-12 lg:pt-16">
         <div className="flex flex-col gap-12 pb-16 min-[90rem]:flex-row min-[90rem]:gap-12">
           {/* Reserva a largura do logotipo aberto (símbolo + palavras) para as
               colunas ficarem paradas no hover. */}
@@ -187,11 +189,17 @@ export function Footer() {
             </div>
           </nav>
         </div>
+      </div>
 
+      {/* Base do rodapé em largura cheia (pedido de 25/09): fora do container de
+          1440, só com as margens laterais do site — a linha vai de margem a
+          margem, os direitos ficam sempre na ponta esquerda e a política na
+          direita, e o nome cresce com a tela em qualquer largura. */}
+      <div className="px-(--spacing-gutter) pb-12 lg:px-(--spacing-gutter-lg)">
         <div className="@container flex flex-col gap-3 border-t border-line-strong pt-6">
-          <div className="flex flex-col justify-between gap-2 text-sm leading-5 tracking-[0.025em] text-fg sm:flex-row">
+          <div className="flex items-start justify-between gap-6 text-sm leading-5 tracking-[0.025em] text-fg">
             <p className="font-medium">© {new Date().getFullYear()}. Todos os direitos reservados.</p>
-            <p className="font-bold">Política de Privacidade</p>
+            <p className="shrink-0 text-right font-bold">Política de Privacidade</p>
           </div>
           <p
             aria-hidden="true"

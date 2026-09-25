@@ -4,12 +4,16 @@
   --mark-top: calc(var(--mark-size) / 2 - 49px);
   position: relative;
   isolation: isolate;
-  z-index: 0;
+  /* Acima da seção de cases (z-10): o que o símbolo passa da base do quadro fica
+     por cima do topo dos cases, sem ser cortado pela borda da seção. */
+  z-index: 11;
   background: var(--color-bg);
   height: calc(100svh + 236px);
   min-height: 1136px;
 }
-.stage { position: sticky; top: 64px; height: calc(100svh - 64px); min-height: 836px; overflow: clip; }
+/* Corta só na horizontal (o símbolo sangra pela direita); na vertical o símbolo
+   pode passar da base do quadro sem traço reto. */
+.stage { position: sticky; top: 64px; height: calc(100svh - 64px); min-height: 836px; overflow-x: clip; overflow-y: visible; }
 /* Malha de 96px em branco discreto, a MESMA da cena de cases (`grid-lines` a 7%).
    Em CSS, não no SVG esticado: com o SVG as células só tinham 96px a 1440 de
    largura e não emendavam com a malha dos cases. A malha final é ancorada na base
@@ -32,7 +36,8 @@
 .wordSlot { display: inline-block; min-width: 5.6em; }
 .word { background: var(--color-azul-solucao); color: var(--color-bg); font-weight: 700; padding: 0 .04em; }
 .word::after { content: ''; display: inline-block; height: .85em; border-right: 2px solid currentColor; margin-left: 2px; animation: caret 1s steps(1) infinite; }
-.markScroll { position: fixed; inset: 64px 0 0; z-index: 1; pointer-events: none; }
+/* Dentro do quadro preso, como o texto: rola junto com ele (antes era `fixed`). */
+.markScroll { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 .mark {
   position: absolute;
   width: var(--mark-size);
@@ -56,9 +61,11 @@
 .hero[data-entered='false'] .loadingGrid { opacity: 1; }
 @keyframes caret { 50% { opacity: 0; } }
 @media (max-width: 767px) {
-  .hero { --mark-size: 390px; --mark-left: calc(50% + 85px); --mark-top: 130px; height: calc(100svh + 176px); min-height: 1040px; }
+  /* Celular: o símbolo vem ANTES do texto, centralizado no alto do quadro, e o
+     texto começa logo abaixo da caixa dele (pedido de 25/09). */
+  .hero { --mark-size: min(330px, 84vw); --mark-left: 50%; --mark-top: calc(var(--mark-size) / 2); height: calc(100svh + 176px); min-height: 1040px; }
   .stage { min-height: 800px; }
-  .copy { padding-top: 310px; padding-bottom: 160px; }
+  .copy { padding-top: var(--mark-size); padding-bottom: 160px; }
   .senai { font-size: clamp(56px, 12vw, 88px); }
   .solutions { font-size: clamp(40px, 9vw, 64px); }
   .tagline { font-size: clamp(23px, 5.7vw, 32px); margin-top: 32px; letter-spacing: -.5px; }
