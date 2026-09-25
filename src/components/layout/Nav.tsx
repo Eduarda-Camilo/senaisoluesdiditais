@@ -193,14 +193,13 @@ export function Nav() {
                     </Dialog.Close>
                   </div>
                   <ul className="mt-10 flex flex-col divide-y divide-line">
-                    {links.map((l, i) => (
+                    {links.map((l) => (
                       <li key={l.href}>
                         <Link
                           href={l.href}
                           onClick={() => setOpen(false)}
                           className="flex items-baseline gap-4 py-5 font-display text-2xl font-semibold hover:text-accent-bright transition-colors"
                         >
-                          <span className="meta text-fg-faint">0{i + 1}</span>
                           {l.label}
                         </Link>
                       </li>
@@ -211,7 +210,6 @@ export function Nav() {
                         onClick={() => setOpen(false)}
                         className="flex items-baseline gap-4 py-5 font-display text-2xl font-semibold text-accent-bright"
                       >
-                        <span className="meta text-fg-faint">05</span>
                         Contato
                       </Link>
                     </li>

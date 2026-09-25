@@ -10,8 +10,20 @@
   min-height: 1136px;
 }
 .stage { position: sticky; top: 64px; height: calc(100svh - 64px); min-height: 836px; overflow: clip; }
-.grid, .loadingGrid { position: absolute; inset: 13px 0 0; pointer-events: none; background: url('/hero/grid.svg') left top / 100% 100% no-repeat; transition: opacity 1.4s ease; }
-.loadingGrid { top: 44px; background-image: url('/hero/grid-loading.svg'); opacity: 0; }
+/* Malha de 96px em branco discreto, a MESMA da cena de cases (`grid-lines` a 7%).
+   Em CSS, não no SVG esticado: com o SVG as células só tinham 96px a 1440 de
+   largura e não emendavam com a malha dos cases. A malha final é ancorada na base
+   do quadro — que é a borda de baixo do Hero quando ele sai —, então as linhas
+   continuam no mesmo passo pela seção seguinte (25/09). */
+.grid, .loadingGrid {
+  position: absolute; inset: 13px 0 0; pointer-events: none; transition: opacity 1.4s ease;
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / .07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / .07) 1px, transparent 1px);
+  background-size: 96px 96px;
+  background-position: left bottom;
+}
+.loadingGrid { top: 44px; background-position: left top; opacity: 0; }
 .copy { position: relative; z-index: 2; width: fit-content; padding-top: max(100px, calc((100svh - 559px) / 2)); margin-left: max(var(--spacing-gutter), calc((100% - var(--container-site)) / 2 + var(--spacing-gutter))); padding-bottom: 170px; opacity: 1; transition: opacity .8s ease; pointer-events: none; }
 @media (min-width: 1024px) { .copy { margin-left: max(var(--spacing-gutter-lg), calc((100% - var(--container-site)) / 2 + var(--spacing-gutter-lg))); } }
 .senai { display: block; font-size: clamp(72px, 7.9708vw, 114.78px); line-height: .9; letter-spacing: -.2701px; }

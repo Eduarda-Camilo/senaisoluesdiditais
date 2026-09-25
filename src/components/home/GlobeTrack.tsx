@@ -49,6 +49,14 @@ import { cn } from "@/lib/cn";
  * atraso: amortecida, ela ficava para trás ao rolar de volta e o recorte do topo
  * da camada cortava o globo (bug de 25/09).
  *
+ * Tamanho por escala, não por largura (bug de 25/09, vídeo "Erros globo"): a
+ * camada tem tamanho fixo — o maior que o globo assume — e encolhe com
+ * `transform: scale()`. Antes a largura mudava a cada quadro e o canvas do three
+ * acompanhava com um ou dois quadros de atraso; ao encolher (voltando do
+ * Trabalhe conosco para o Sobre) o canvas ficava maior que a camada e o recorte
+ * dela o cortava num traço reto. O canvas mede o tamanho sem transformação
+ * (`offsetSize`), então não é redimensionado durante o scroll.
+ *
  * Abaixo de `lg`, com prefers-reduced-motion ou sem WebGL, não há travessia: o
  * slot mostra o SVG parado, e Serviços e Parcerias ficam sem globo.
  */
@@ -156,6 +164,7 @@ export function GlobeTrack({ children }: { children: ReactNode }) {
     let x: number | null = null;
     let y = 0;
     let w = 0;
+    let base = 0; // tamanho fixo da camada (px); só muda quando a tela muda
 
     const tick = (now: number) => {
       raf = requestAnimationFrame(tick);
@@ -230,15 +239,25 @@ export function GlobeTrack({ children }: { children: ReactNode }) {
       spin.current = window.scrollY * 0.0015;
 
       w += (size - w) * (w ? 1 - Math.exp(-dt * 14) : 1);
-      layer.style.width = `${w}px`;
-      layer.style.height = `${w}px`;
-      layer.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      const biggest = Math.max(ar.width, pr.width, br.width, cr.width);
+      if (Math.abs(biggest - base) > 0.5) {
+        base = biggest;
+        layer.style.width = `${base}px`;
+        layer.style.height = `${base}px`;
+      }
+      const scale = base > 0 ? w / base : 1;
+      layer.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
       // Recorta na caixa das seções (a faixa branca do Trabalhe conosco já
-      // cobre o globo por ter fundo; o recorte cuida do que vem depois).
+      // cobre o globo por ter fundo; o recorte cuida do que vem depois). O
+      // `inset` é medido na camada antes da escala, por isso a divisão.
       const clipTop = Math.max(0, wr.top - y);
       const clipBottom = Math.max(0, y + w - wr.bottom);
-      layer.style.clipPath = `inset(${clipTop}px 0 ${clipBottom}px 0)`;
-      layer.style.visibility = clipTop + clipBottom >= w ? "hidden" : "visible";
+      layer.style.clipPath = `inset(${clipTop / scale}px 0 ${clipBottom / scale}px 0)`;
+      // Na primeira aparição o canvas nasce com o tamanho padrão (300 × 150) até
+      // o three medir a camada: fica escondido até ter o tamanho certo.
+      const canvas = layer.querySelector("canvas");
+      const sized = !canvas || Math.abs(canvas.offsetWidth - base) <= 1;
+      layer.style.visibility = !sized || clipTop + clipBottom >= w ? "hidden" : "visible";
     };
     raf = requestAnimationFrame(tick);
     return () => {
@@ -254,7 +273,7 @@ export function GlobeTrack({ children }: { children: ReactNode }) {
           <div
             ref={layerRef}
             aria-hidden="true"
-            className="pointer-events-none fixed top-0 left-0 -z-10 will-change-transform"
+            className="pointer-events-none fixed top-0 left-0 -z-10 origin-top-left will-change-transform"
             style={{ visibility: "hidden" }}
           >
             {webgl ? <GlobeScene spin={spin} active={onScreen} /> : <Poster />}

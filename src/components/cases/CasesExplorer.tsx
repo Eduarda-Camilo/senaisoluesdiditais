@@ -3,7 +3,7 @@
 import { Toggle } from "@base-ui/react/toggle";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { useMemo, useState } from "react";
-import { capabilities } from "@/content/capabilities";
+import { filterCapabilities } from "@/content/capabilities";
 import { cases, casesInOrder } from "@/content/cases";
 import { segments } from "@/content/segments";
 import type { CapabilitySlug, Segment } from "@/content/types";
@@ -15,8 +15,13 @@ import { cn } from "@/lib/cn";
  * node 125:317; estado filtrado em 108:2446).
  *
  * Filtro ativo fica Azul Digital com texto preto, como no design. "Limpar
- * filtros" aparece embaixo dos serviços só quando há filtro.
+ * filtros" aparece no fim dos filtros, depois de Segmento, só quando há filtro —
+ * embaixo dos serviços parecia limpar só eles (25/09).
+ *
+ * Sem Cloud e DevOps na AWS nos filtros (25/09): nenhum case está marcado com
+ * ela, e a AWS tem seção própria (Parcerias) e a página /aws.
  */
+
 
 const filterCls =
   "rounded-xs border border-fg px-[0.9375rem] py-2 text-left text-sm leading-5 text-fg-body cursor-pointer select-none transition-colors duration-fast hover:bg-fg/10 data-pressed:border-azul-digital data-pressed:bg-azul-digital data-pressed:text-neutra-100";
@@ -60,24 +65,12 @@ export function CasesExplorer({
             aria-label="Filtrar por serviço"
             className="flex flex-wrap items-start gap-2 lg:flex-col lg:gap-[0.4375rem]"
           >
-            {capabilities.map((c) => (
+            {filterCapabilities.map((c) => (
               <Toggle key={c.slug} value={c.slug} className={filterCls}>
                 {c.name}
               </Toggle>
             ))}
           </ToggleGroup>
-          {filtered && (
-            <button
-              type="button"
-              onClick={() => {
-                setCap([]);
-                setSeg([]);
-              }}
-              className="mt-[0.4375rem] text-sm leading-5 text-fg-body underline underline-offset-4 hover:text-fg cursor-pointer"
-            >
-              Limpar filtros
-            </button>
-          )}
         </fieldset>
         <fieldset>
           <legend className={cn(headingCls, "mb-6")}>Segmento</legend>
@@ -95,6 +88,18 @@ export function CasesExplorer({
             ))}
           </ToggleGroup>
         </fieldset>
+        {filtered && (
+          <button
+            type="button"
+            onClick={() => {
+              setCap([]);
+              setSeg([]);
+            }}
+            className="w-fit border-t border-line-strong pt-4 text-sm leading-5 text-fg-body underline underline-offset-4 hover:text-fg cursor-pointer lg:w-full lg:text-left"
+          >
+            Limpar filtros
+          </button>
+        )}
         <p className="sr-only" aria-live="polite">
           {list.length} de {cases.length} cases
         </p>

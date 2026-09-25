@@ -116,7 +116,7 @@ export function Contact() {
                     <Copy size={20} weight="bold" aria-hidden="true" />
                     <span className="sr-only">Copiar e-mail</span>
                   </button>
-                  <span className="meta-sm text-fg-muted" aria-live="polite">
+                  <span className="meta text-fg-muted" aria-live="polite">
                     {copied ? "copiado" : ""}
                   </span>
                 </p>
@@ -213,7 +213,7 @@ export function Contact() {
               <div className="mt-3 flex flex-col items-start gap-3">
                 <button
                   type="submit"
-                  className="group inline-flex h-12 items-center gap-4 bg-accent text-fg rounded-xs px-8 text-base font-medium hover:bg-accent-hover transition-colors duration-fast"
+                  className="group inline-flex h-12 w-full items-center justify-center gap-4 bg-accent text-fg rounded-xs px-8 text-base font-medium hover:bg-accent-hover transition-colors duration-fast sm:w-auto"
                 >
                   Enviar mensagem
                   <ArrowRight

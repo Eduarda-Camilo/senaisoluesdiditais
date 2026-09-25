@@ -8,7 +8,6 @@ import { ArrowUpRight } from "@/components/ui/icons";
 import { cases } from "@/content/cases";
 import { caseScenes } from "@/content/scenes";
 import { cn } from "@/lib/cn";
-import { useLiquidEntrance } from "./useLiquidEntrance";
 
 /**
  * Nossos cases — cena única em laranja, a segunda seção da home.
@@ -33,11 +32,21 @@ import { useLiquidEntrance } from "./useLiquidEntrance";
  * se enchendo de branco conforme o scroll avança dentro dele. Clicar num traço
  * rola até o projeto. Não tem botão de pausa: aqui quem avança é o scroll.
  *
+ * Passagem do Hero (25/09): o Hero fica todo preto e a virada para o laranja
+ * acontece na passagem entre as seções. O topo desta seção é uma cortina preta
+ * (`bg-dawn`) que desbota em arco — o laranja sobe primeiro pelo centro — até o
+ * laranja chapado. Ela fica no quadro fixo, entre a malha e o conteúdo, e o laço
+ * de scroll a faz subir junto com o topo da seção; então o
+ * título "Nossos cases" nasce sobre o mesmo preto do Hero e o laranja aparece
+ * embaixo dele, sem caixa nem corte. O símbolo 3D do Hero some junto (Hero.tsx).
+ *
  * Sem JS ou com prefers-reduced-motion, cai para uma lista estática equivalente.
  *
  * CONTRASTE: o texto é branco sobre o laranja SENAI por decisão da equipe (23/09).
  * Medido: 3,91:1 — passa AA para texto grande (logotipo, número), fica abaixo do
- * mínimo para o resumo e os rótulos mono. Em preto era 5,37:1.
+ * mínimo para o resumo e os rótulos mono. Em preto era 5,37:1. Por isso o "ver o
+ * case" cresceu para 19px em negrito (25/09): conta como texto grande (≥ 14pt
+ * negrito), em que 3:1 basta.
  */
 
 /** Fração do passo reservada à transição: os últimos 30% do scroll de cada slide. */
@@ -52,9 +61,9 @@ export function CasesScene() {
   const sectionRef = useRef<HTMLElement>(null);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const fillRef = useRef<HTMLSpanElement>(null);
+  const curtainRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const reduce = useReducedMotion();
-  const entranceRef = useLiquidEntrance(sectionRef, reduce);
   const n = caseScenes.length;
 
   useEffect(() => {
@@ -67,6 +76,16 @@ export function CasesScene() {
       const el = sectionRef.current;
       if (!el) return;
       const { top, height } = el.getBoundingClientRect();
+
+      // A cortina mora dentro do quadro fixo (por cima da malha, por baixo do
+      // conteúdo), mas precisa subir como se estivesse presa ao topo da seção:
+      // enquanto o quadro está preso, ela sobe o que a seção já passou do topo.
+      const curtain = curtainRef.current;
+      if (curtain) {
+        curtain.style.transform = `translate3d(0, ${Math.min(0, top)}px, 0)`;
+        curtain.style.visibility = top < -curtain.offsetHeight ? "hidden" : "visible";
+      }
+
       const travel = height - window.innerHeight;
       if (travel <= 0) return;
 
@@ -138,15 +157,24 @@ export function CasesScene() {
       ref={sectionRef}
       id="cases"
       aria-labelledby="cases-titulo"
-      className="relative z-10 text-fg"
+      className="relative z-10 bg-mark text-fg"
       style={{ height: `${n * 100}svh` }}
     >
+      <div className="sticky top-0 h-svh overflow-hidden">
+        {/* Cortina preta que continua o Hero e desbota em arco para o laranja; sobe
+            com o scroll (laço acima). */}
+        <div
+          ref={curtainRef}
+          aria-hidden="true"
+          className="bg-dawn pointer-events-none absolute inset-x-0 top-0 h-[85svh] will-change-transform"
+        />
 
-      <div ref={entranceRef} className="sticky top-0 h-svh overflow-hidden bg-mark" style={{ willChange: "clip-path" }}>
-        {/* Malha suave (12%): textura, não grade de planilha — pedido de 23/09. */}
+        {/* Malha de 96px a 7% — a mesma do Hero, em branco (sem laranja, 25/09).
+            Fica por cima da cortina: as linhas atravessam a passagem sem corte, no
+            mesmo passo e alinhadas com as do Hero (Hero.module.css). */}
         <div
           aria-hidden="true"
-          className="grid-lines absolute inset-0 text-fg/12 pointer-events-none"
+          className="grid-lines absolute inset-0 text-fg/7 pointer-events-none"
         />
 
         {/* Título da seção, fixo no alto do quadro — não troca com os slides, e
@@ -209,9 +237,11 @@ export function CasesScene() {
               <div className="flex flex-col gap-7 max-w-[26rem]">
                 {/* `unoptimized`: são logotipos pequenos, e o otimizador do Next
                     engasgava ao ampliar o do AVA (402px de origem para 640). */}
+                {/* O nome do projeto está no título (h3) logo abaixo, então o
+                    logotipo é decorativo — alt vazio evita leitura duplicada. */}
                 <Image
                   src={s.wordmark.src}
-                  alt={s.short}
+                  alt=""
                   width={s.wordmark.width}
                   height={s.wordmark.height}
                   unoptimized
@@ -219,17 +249,19 @@ export function CasesScene() {
                   className="w-auto h-auto max-h-[4.5rem] max-w-[20rem] object-contain object-left"
                 />
 
-                <BigNumber value={s.metric.value} label={s.metric.label} />
+                <BigNumber name={s.short} value={s.metric.value} label={s.metric.label} />
 
-                <p className="text-base lg:text-lg font-medium leading-relaxed">{s.summary}</p>
+                {/* 19px em negrito: texto grande para o WCAG, em que o branco sobre o
+                    laranja (3,9:1) passa AA — em 16–18px médio não passava (WAVE, 25/09). */}
+                <p className="text-[1.1875rem] font-bold leading-snug">{s.summary}</p>
 
                 <Link
                   href={`/cases/${s.slug}`}
-                  className="group inline-flex items-center gap-2 meta font-medium w-fit border-b border-fg/50 pb-1.5 transition-colors duration-fast hover:border-fg"
+                  className="group inline-flex items-center gap-2.5 font-mono text-[1.1875rem] font-bold uppercase leading-[1.2] tracking-[0.08em] w-fit border-b-2 border-fg pb-2 transition-colors duration-fast hover:border-fg/60"
                 >
                   ver o case
                   <ArrowUpRight
-                    size={16}
+                    size={20}
                     weight="bold"
                     aria-hidden="true"
                     className="transition-transform duration-base ease-out-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -321,8 +353,8 @@ function CaseBar({
  * Reduz a fonte em passos até caber. Escreve `fontSize` direto no elemento em vez
  * de guardar em estado — é sincronização com o DOM, e evita um render a mais.
  */
-function BigNumber({ value, label }: { value: string; label: string }) {
-  const ref = useRef<HTMLParagraphElement>(null);
+function BigNumber({ name, value, label }: { name: string; value: string; label: string }) {
+  const ref = useRef<HTMLHeadingElement>(null);
 
   useLayoutEffect(() => {
     const el = ref.current;
@@ -352,10 +384,13 @@ function BigNumber({ value, label }: { value: string; label: string }) {
   }, [value, label]);
 
   return (
-    <p ref={ref} className="font-display font-extrabold text-display-xl leading-[0.9] tabular">
+    // É o título de cada projeto (h3): o WAVE apontava um "possível título" num
+    // parágrafo. O nome vai para o leitor de tela; na tela, o logotipo já o mostra.
+    <h3 ref={ref} className="font-display font-extrabold text-display-xl leading-[0.9] tabular">
+      <span className="sr-only">{name}: </span>
       <span className="block whitespace-nowrap">{value}</span>
       <span className="block">{label}</span>
-    </p>
+    </h3>
   );
 }
 
@@ -372,20 +407,21 @@ function StaticList() {
             <div className="flex flex-col gap-6">
               <Image
                 src={s.wordmark.src}
-                alt={s.short}
+                alt=""
                 width={s.wordmark.width}
                 height={s.wordmark.height}
                 unoptimized
                 className="w-auto h-auto max-h-16 max-w-[18rem] object-contain object-left"
               />
-              <p className="font-display font-extrabold text-display-lg leading-[0.9] tabular">
+              <h3 className="font-display font-extrabold text-display-lg leading-[0.9] tabular">
+                <span className="sr-only">{s.short}: </span>
                 <span className="block whitespace-nowrap">{s.metric.value}</span>
                 <span className="block">{s.metric.label}</span>
-              </p>
-              <p className="text-base font-medium leading-relaxed">{s.summary}</p>
+              </h3>
+              <p className="text-[1.1875rem] font-bold leading-snug">{s.summary}</p>
               <Link
                 href={`/cases/${s.slug}`}
-                className="meta font-medium w-fit border-b border-fg/50 pb-1.5"
+                className="font-mono text-[1.1875rem] font-bold uppercase leading-[1.2] tracking-[0.08em] w-fit border-b-2 border-fg pb-2"
               >
                 ver o case ↗
               </Link>

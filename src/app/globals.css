@@ -39,8 +39,6 @@
   --color-accent-hover: #2a99ff;
   --color-accent-bright: #00bcff;
   --color-mark: #e84910;
-  /* Tom intermediário do arco preto → laranja do Hero (ver `bg-arc`). */
-  --color-ember: #641d07;
 
   /* Tipografia */
   --font-display: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
@@ -239,40 +237,21 @@
 }
 
 /* ──────────────────────────────────────────────────────────────
-   ARCO DO HERO (pedido de 23/09: o gradiente "forma um arco" para a
-   seção seguinte).
-   Uma elipse centrada na borda de baixo do Hero: laranja no centro,
-   escurecendo para as laterais e para cima até o preto. A cena de
-   cases continua com `bg-arc-tail`, que é a MESMA elipse lida na
-   linha do centro (um degradê horizontal com as mesmas paradas) e
-   desbota para o laranja chapado. Como a borda entre as duas seções
-   é exatamente a linha do centro da elipse, as cores batem pixel a
-   pixel na junção.
+   PASSAGEM HERO → CASES (25/09). O Hero é todo preto; a virada para o
+   laranja acontece na passagem. `bg-dawn` é uma cortina preta no topo
+   da seção de cases (que tem fundo laranja): a máscara é uma elipse
+   centrada na base — o laranja aparece primeiro no centro e sobe em
+   arco, as laterais escurecem por mais tempo — cruzada com um degradê
+   vertical que garante a base 100% transparente, sem emenda com o
+   laranja chapado logo abaixo. Preto semitransparente sobre o laranja
+   dá os tons de brasa do arco antigo.
    ────────────────────────────────────────────────────────────── */
-:root {
-  --arc-rx: max(130vw, 42rem); /* raio horizontal: quanto maior, mais suave o arco */
-  --arc-ry: 62svh; /* raio vertical: onde o preto começa, medido da base do Hero */
-}
-
-@utility bg-arc {
-  background: radial-gradient(
-    var(--arc-rx) var(--arc-ry) at 50% 100%,
-    var(--color-mark) 0%,
-    var(--color-ember) 35%,
-    #000 100%
-  );
-}
-
-@utility bg-arc-tail {
-  background: linear-gradient(
-    to right,
-    #000 calc(50% - var(--arc-rx)),
-    var(--color-ember) calc(50% - 0.35 * var(--arc-rx)),
-    var(--color-mark) 50%,
-    var(--color-ember) calc(50% + 0.35 * var(--arc-rx)),
-    #000 calc(50% + var(--arc-rx))
-  );
-  mask-image: linear-gradient(to bottom, #000, transparent);
+@utility bg-dawn {
+  background: #000;
+  mask-image:
+    radial-gradient(max(130vw, 42rem) 100% at 50% 100%, transparent 0%, rgb(0 0 0 / 0.62) 52%, #000 100%),
+    linear-gradient(to bottom, #000 40%, transparent 100%);
+  mask-composite: intersect;
 }
 
 @utility tabular {

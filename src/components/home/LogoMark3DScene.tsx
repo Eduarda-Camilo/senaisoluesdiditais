@@ -1,8 +1,9 @@
 "use client";
 
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader.js";
 
 /**
@@ -13,6 +14,19 @@ import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader.js";
  * geometria limpa de ~3k triângulos a partir de alguns KB — e, de brinde, as duas
  * metades ficam em meshes separados, que é o que torna possível a interação
  * assinatura. Ver docs/DIRECAO-V2.md §5.
+ *
+ * Acabamento (25/09, referência: studiors.be): preto brilhante, como laca ou
+ * obsidiana, em vez do metal rosado com luzes laranja. O que dá o ar "premium" é
+ * o reflexo: um ambiente de estúdio (RoomEnvironment, gerado em runtime — sem
+ * baixar HDR) reflete painéis claros no verniz, e o chanfro arredondado pega luz
+ * nas arestas, desenhando o contorno sobre o fundo preto. Uma luz de recorte por
+ * trás separa a peça do fundo. Um granulado fino (textura gerada em canvas) quebra
+ * a rugosidade para o reflexo não ficar de plástico. Por baixo, luz laranja
+ * SENAI: o chão do estúdio refletido é uma placa laranja acesa, e duas luzes
+ * vindas de baixo reforçam — as faces e arestas de baixo ficam quentes, como se
+ * a peça estivesse sobre uma fonte de luz; o resto continua preto. Como
+ * complemento frio, um pouco de Azul Solução pela esquerda-alto (um painel no
+ * ambiente e uma luz de recorte), bem mais fraco que o laranja.
  */
 
 // Igual a public/brand/sd-simbolo-branco.svg. Inline para evitar um fetch no caminho
@@ -22,10 +36,80 @@ const MARK_SVG = `<svg viewBox="0 0 122 145" xmlns="http://www.w3.org/2000/svg">
 const EXTRUDE = {
   depth: 18,
   bevelEnabled: true,
-  bevelThickness: 1.2,
-  bevelSize: 0.8,
-  bevelSegments: 2,
+  bevelThickness: 2,
+  bevelSize: 1.3,
+  // Chanfro redondo: é nele que o reflexo vira um fio de luz nas arestas.
+  bevelSegments: 8,
+  curveSegments: 24,
 } satisfies THREE.ExtrudeGeometryOptions;
+
+/**
+ * Granulado fino, repetido: modula a rugosidade e dá um relevo mínimo à laca.
+ * Gerado uma vez por módulo, com semente fixa — igual em todo carregamento.
+ */
+let grainTexture: THREE.CanvasTexture | null = null;
+function getGrain() {
+  if (grainTexture) return grainTexture;
+  const size = 256;
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext("2d")!;
+  const img = ctx.createImageData(size, size);
+  let seed = 0x5d1e;
+  const rand = () => {
+    // mulberry32
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  for (let i = 0; i < img.data.length; i += 4) {
+    const v = 118 + rand() * 40;
+    img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+    img.data[i + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+  grainTexture = new THREE.CanvasTexture(canvas);
+  grainTexture.wrapS = grainTexture.wrapT = THREE.RepeatWrapping;
+  // As UVs da extrusão estão nas unidades do SVG (0–145): um ladrilho a cada 24.
+  grainTexture.repeat.set(1 / 24, 1 / 24);
+  return grainTexture;
+}
+
+/**
+ * Ambiente de estúdio para os reflexos, gerado uma vez e preso à cena. O chão do
+ * estúdio ganha uma placa laranja SENAI acesa: é ela que o verniz reflete nas
+ * faces e chanfros virados para baixo — a luz quente "de baixo".
+ */
+function StudioEnvironment() {
+  const gl = useThree((s) => s.gl);
+  const env = useMemo(() => {
+    const pmrem = new THREE.PMREMGenerator(gl);
+    const room = new RoomEnvironment();
+    const warm = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+    warm.color.setRGB(2, 0.55, 0.13); // #e84910 um pouco acima de 1 — só um toque quente
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(14, 14), warm);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -0.6;
+    room.add(floor);
+    // Contraponto frio: um painel Azul Solução alto, à esquerda e um pouco atrás.
+    const cool = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+    cool.color.setRGB(0.025, 0.29, 1.1); // #0574d9 — mais fraco que o laranja
+    const panel = new THREE.Mesh(new THREE.PlaneGeometry(3, 7), cool);
+    panel.position.set(-6, 2.5, -2);
+    panel.rotation.y = Math.PI / 2.6;
+    room.add(panel);
+    const texture = pmrem.fromScene(room, 0.04).texture;
+    floor.geometry.dispose();
+    warm.dispose();
+    panel.geometry.dispose();
+    cool.dispose();
+    pmrem.dispose();
+    return texture;
+  }, [gl]);
+  useEffect(() => () => env.dispose(), [env]);
+  return <primitive object={env} attach="environment" />;
+}
 
 function useMarkGeometries() {
   return useMemo(() => {
@@ -56,6 +140,7 @@ function useMarkGeometries() {
 function Mark({ onReady, intro }: { onReady: () => void; intro: boolean }) {
   const group = useRef<THREE.Group>(null);
   const geometries = useMarkGeometries();
+  const grain = useMemo(() => getGrain(), []);
   const ready = useRef(false);
   const rotation = useRef(0);
   const speed = useRef(.55);
@@ -83,19 +168,35 @@ function Mark({ onReady, intro }: { onReady: () => void; intro: boolean }) {
   });
   return <group ref={group} scale={[.0175, -.0175, .0175]}>
     {geometries.map((geo, i) => <mesh key={i} geometry={geo}>
-      <meshStandardMaterial color="#a8a4a3" metalness={.22} roughness={.3} />
+      <meshPhysicalMaterial
+        color="#101012"
+        metalness={.55}
+        roughness={.32}
+        roughnessMap={grain}
+        bumpMap={grain}
+        bumpScale={.35}
+        clearcoat={1}
+        clearcoatRoughness={.07}
+        envMapIntensity={1.15}
+      />
     </mesh>)}
   </group>;
 }
 
 export default function LogoMark3DScene({ onReady, intro }: { onReady: () => void; intro: boolean }) {
   return <Canvas resize={{ offsetSize: true }} camera={{ position: [0, 0, 4.2], fov: 45 }} dpr={[1, 1.5]} gl={{ antialias: true, alpha: true }} aria-hidden="true" style={{ touchAction: "pan-y" }}>
-    <ambientLight intensity={.45} />
-    <directionalLight position={[4, 5, 6]} intensity={1.9} color="#ffffff" />
-    <directionalLight position={[-3, -2, 4]} intensity={.8} color="#ffffff" />
-    <pointLight position={[0, -3, 1]} intensity={50} color="#ff681c" />
-    <directionalLight position={[0, -5, 1]} intensity={1.1} color="#ff8b46" />
-    <pointLight position={[-5, 3, 2]} intensity={25} color="#e84910" />
+    <StudioEnvironment />
+    <ambientLight intensity={.08} />
+    {/* Chave suave pela frente-alto e recorte forte por trás, dos dois lados. */}
+    <directionalLight position={[3, 4, 5]} intensity={.9} color="#ffffff" />
+    <directionalLight position={[-5, 3, -4]} intensity={2.4} color="#ffffff" />
+    {/* Recorte Azul Solução pela esquerda-alto: o complemento frio do laranja. */}
+    <directionalLight position={[-6, 4, -1]} intensity={0.9} color="#0574d9" />
+    <directionalLight position={[5, -2, -3]} intensity={1.4} color="#dfe6ff" />
+    {/* Laranja por baixo: um ponto quente logo abaixo da peça e um preenchimento
+        largo vindo de baixo-frente, que pinta os chanfros de baixo. */}
+    <pointLight position={[0, -2.4, 1.4]} intensity={40} distance={9} decay={2} color="#e84910" />
+    <directionalLight position={[-1, -5, 2]} intensity={2} color="#ff6a1f" />
     <Mark onReady={onReady} intro={intro} />
   </Canvas>;
 }

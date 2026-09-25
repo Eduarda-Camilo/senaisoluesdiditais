@@ -60,10 +60,12 @@ export function Careers() {
           <div className="min-w-0">
             <CareersCarousel />
             {/* Fim da travessia do globo: a cúpula e o "Vem ser FIESC", cortados
-                pela faixa branca (referência de 24/09). */}
-            <div className="bleed-right relative mt-11 h-[calc(var(--globe-end)*0.19)] overflow-hidden [--globe-end:90vw] lg:[--globe-end:min(52.5vw,47.3rem)]">
-              <GlobeEnd className="absolute top-0 left-1/2 w-(--globe-end) -translate-x-1/2" />
-              <p className="absolute bottom-0 left-0 translate-y-[18%] whitespace-nowrap font-display font-extrabold uppercase leading-none tracking-[-0.045em] text-[clamp(2rem,3.9vw,3.5rem)]">
+                pela faixa branca (referência de 24/09). No celular não há globo
+                (feedback de 25/09): o "Vem ser FIESC" fica centralizado, em fluxo
+                normal, e quebra em duas linhas se não couber. */}
+            <div className="relative mt-11 pb-12 lg:pb-0 lg:bleed-right lg:h-[calc(var(--globe-end)*0.19)] lg:overflow-hidden lg:[--globe-end:min(52.5vw,47.3rem)]">
+              <GlobeEnd className="absolute top-0 left-1/2 hidden w-(--globe-end) -translate-x-1/2 lg:block" />
+              <p className="text-center text-balance font-display font-extrabold uppercase leading-[0.95] tracking-[-0.045em] text-[clamp(1.75rem,9vw,2.5rem)] lg:absolute lg:bottom-0 lg:left-0 lg:translate-y-[18%] lg:whitespace-nowrap lg:text-left lg:leading-none lg:text-[clamp(2rem,3.9vw,3.5rem)]">
                 Vem ser FIESC
               </p>
             </div>
@@ -100,7 +102,7 @@ export function Careers() {
           </ul>
 
           <div className="mt-14 lg:mt-16 flex flex-wrap items-center gap-x-10 gap-y-4">
-            <p className="font-display font-bold text-2xl lg:text-[1.75rem]">Acompanhe nas redes:</p>
+            <h3 className="font-display font-bold text-2xl lg:text-[1.75rem]">Acompanhe nas redes:</h3>
             <ul className="flex flex-wrap gap-x-8 gap-y-3">
               {site.social.map((s) => (
                 <li key={s.name}>

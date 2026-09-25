@@ -93,6 +93,9 @@ export default function GlobeScene({ spin, active }: { spin: RefObject<number>; 
   return (
     <Canvas
       frameloop={active ? "always" : "never"}
+      // Mede sem a escala da camada (GlobeTrack): o canvas não é redimensionado
+      // enquanto o globo cresce ou encolhe.
+      resize={{ offsetSize: true }}
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
       camera={{ fov: FOV, position: [0, 0, DISTANCE], near: 0.1, far: 20 }}

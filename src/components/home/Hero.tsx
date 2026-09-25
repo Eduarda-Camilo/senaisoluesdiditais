@@ -3,6 +3,7 @@
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { LogoMark3D } from "./LogoMark3D";
+import { hasEnteredSite } from "@/lib/site-entry";
 import styles from "./Hero.module.css";
 
 const words = ["a indústria", "a educação", "negócios"];
@@ -38,14 +39,32 @@ function TypedWords({ active }: { active: boolean }) {
 
 export function Hero() {
   const section = useRef<HTMLElement>(null);
-  const [progress, setProgress] = useState(0);
-  const [phase, setPhase] = useState("loading");
+  // A abertura só toca no primeiro carregamento da visita; voltando à home por um
+  // link interno, o Hero já nasce pronto (lib/site-entry.ts). Na hidratação da
+  // primeira página a marca ainda é falsa, então servidor e cliente concordam.
+  const [skipIntro] = useState(hasEnteredSite);
+  const [progress, setProgress] = useState(skipIntro ? 100 : 0);
+  const [phase, setPhase] = useState(skipIntro ? "ready" : "loading");
   const reduce = useReducedMotion();
   const entered = phase === "ready" || !!reduce;
   const currentPhase = reduce ? "ready" : phase;
   const { scrollYProgress } = useScroll({ target: section, offset: ["start 64px", "end start"] });
   const copyY = useTransform(scrollYProgress, [0, 0.25, 1], [0, 103, 103]);
   const markLayer = useRef<HTMLDivElement>(null);
+  // O símbolo fica numa camada fixa, por baixo da seção de cases: some enquanto a
+  // base do Hero sobe de 150px abaixo da tela até 15% acima da base dela, para já
+  // estar quase invisível quando o topo dos cases passa por cima — senão a borda
+  // da seção o cortaria ao meio. Medido em px da base do Hero (não em % da tela):
+  // em telas altas o Hero sobra menos que 25% da tela, e o símbolo nasceria
+  // meio apagado.
+  const { scrollY } = useScroll();
+  const markOpacity = useTransform(scrollY, () => {
+    const el = section.current;
+    if (!el) return 1;
+    const vh = window.innerHeight;
+    const below = el.getBoundingClientRect().bottom - vh;
+    return Math.min(1, Math.max(0, (below + vh * 0.15) / (150 + vh * 0.15)));
+  });
 
   useEffect(() => {
     const element = section.current;
@@ -58,7 +77,7 @@ export function Hero() {
   }, []);
 
   useEffect(() => {
-    if (reduce) return;
+    if (reduce || skipIntro) return;
     const started = performance.now();
     let frame = 0;
     const update = () => {
@@ -70,7 +89,7 @@ export function Hero() {
     };
     frame = requestAnimationFrame(update);
     return () => cancelAnimationFrame(frame);
-  }, [reduce]);
+  }, [reduce, skipIntro]);
 
   useEffect(() => {
     if (reduce || (phase !== "growing" && phase !== "moving")) return;
@@ -94,9 +113,9 @@ export function Hero() {
           <span aria-hidden="true">Produtos digitais que<br />transformam <TypedWords active={entered} /></span>
         </p>
       </motion.div>
-      <div ref={markLayer} className={styles.markScroll}>
+      <motion.div ref={markLayer} className={styles.markScroll} style={{ opacity: reduce ? 1 : markOpacity }}>
         <div className={styles.mark}><div className={styles.markVisual}><LogoMark3D intro={currentPhase === "loading"} /></div></div>
-      </div>
+      </motion.div>
       </div>
     </section>
   );

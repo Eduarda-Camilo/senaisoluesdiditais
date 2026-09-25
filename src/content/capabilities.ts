@@ -95,6 +95,13 @@ export const capabilities: Capability[] = [
   },
 ];
 
+/**
+ * Serviços oferecidos como filtro e como lista (home, rodapé, /cases): todos
+ * menos Cloud e DevOps na AWS, que tem seção própria (Parcerias) e a página /aws
+ * — decisão de 25/09. Nenhum case está marcado com ela.
+ */
+export const filterCapabilities = capabilities.filter((c) => c.slug !== "cloud");
+
 export function getCapability(slug: string) {
   return capabilities.find((c) => c.slug === slug);
 }

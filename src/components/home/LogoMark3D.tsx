@@ -3,17 +3,25 @@
 import { useReducedMotion } from "motion/react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { Component, useEffect, useSyncExternalStore, type ReactNode } from "react";
+import { Component, useCallback, useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 
-const Scene = dynamic(() => import("./LogoMark3DScene"), { ssr: false, loading: () => <Poster /> });
+/**
+ * Sem a troca seca pôster → canvas (a "piscada" da abertura, 25/09): o pôster é
+ * uma camada fixa que nunca desmonta, e o canvas fica por cima, invisível, até
+ * desenhar o primeiro quadro; aí os dois trocam por opacidade. Antes, o pôster
+ * era desmontado e remontado pelo `loading` do import dinâmico e sumia de vez
+ * quando o canvas montava — que passava alguns quadros vazio.
+ */
+const Scene = dynamic(() => import("./LogoMark3DScene"), { ssr: false });
 function Poster() {
-  return <Image src="/hero/mark-poster-warm.png" alt="" fill priority sizes="(max-width: 767px) 390px, 983px" className="object-contain" />;
+  return <Image src="/hero/mark-poster.png" alt="" fill priority sizes="(max-width: 767px) 390px, 983px" className="object-contain" />;
 }
 class SceneBoundary extends Component<{ children: ReactNode; onReady: () => void }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
   componentDidCatch() { this.props.onReady(); }
-  render() { return this.state.failed ? <Poster /> : this.props.children; }
+  // Se o 3D falhar, o pôster de baixo continua aparecendo.
+  render() { return this.state.failed ? null : this.props.children; }
 }
 let webglCache: boolean | null = null;
 function hasWebGL() {
@@ -32,8 +40,18 @@ export function LogoMark3D({ onReady = ignoreReady, intro = false }: { onReady?:
   const reduce = useReducedMotion();
   const hydrated = useSyncExternalStore(neverChanges, () => true, () => false);
   const enabled = hydrated && !reduce && hasWebGL();
+  const [live, setLive] = useState(false);
   useEffect(() => { if (hydrated && !enabled) onReady(); }, [hydrated, enabled, onReady]);
+  // O primeiro `useFrame` roda antes do primeiro desenho: espera o quadro seguinte.
+  const handleReady = useCallback(() => {
+    requestAnimationFrame(() => setLive(true));
+    onReady();
+  }, [onReady]);
+  const fade = "absolute inset-0 transition-opacity duration-700 ease-out";
   return <div className="relative h-full w-full" aria-hidden="true">
-    <SceneBoundary onReady={onReady}>{enabled ? <Scene onReady={onReady} intro={intro} /> : <Poster />}</SceneBoundary>
+    <div className={fade} style={{ opacity: live ? 0 : 1 }}><Poster /></div>
+    {enabled && <div className={fade} style={{ opacity: live ? 1 : 0 }}>
+      <SceneBoundary onReady={onReady}><Scene onReady={handleReady} intro={intro} /></SceneBoundary>
+    </div>}
   </div>;
 }

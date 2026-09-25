@@ -160,7 +160,8 @@ export function About() {
             <h2 id="sobre-titulo" className="font-display font-extrabold text-[clamp(3rem,1rem+4.5vw,4.625rem)] leading-[0.9]">
               Sobre nós
             </h2>
-            <GlobeSlot className="w-full max-w-[26rem] mx-auto lg:mx-0 lg:max-w-none lg:w-(--globe) lg:-ml-12" />
+            {/* Sem globo no celular (feedback de 25/09): o slot só existe a partir de lg. */}
+            <GlobeSlot className="hidden lg:block lg:w-(--globe) lg:-ml-12" />
           </div>
 
           <div ref={columnRef}>

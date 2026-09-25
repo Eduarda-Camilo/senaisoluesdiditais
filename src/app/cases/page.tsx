@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CasesExplorer } from "@/components/cases/CasesExplorer";
 import { Reveal } from "@/components/ui/Reveal";
-import { capabilities } from "@/content/capabilities";
+import { filterCapabilities } from "@/content/capabilities";
 import { cases } from "@/content/cases";
 import { segments } from "@/content/segments";
 import type { CapabilitySlug, Segment } from "@/content/types";
@@ -16,7 +16,7 @@ export default async function CasesPage({ searchParams }: PageProps<"/cases">) {
   // de setor na home.
   const sp = await searchParams;
   const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
-  const initialCapability = capabilities.find((c) => c.slug === one(sp.capacidade))?.slug as
+  const initialCapability = filterCapabilities.find((c) => c.slug === one(sp.capacidade))?.slug as
     | CapabilitySlug
     | undefined;
   const initialSegment = segments.find((s) => s.value === one(sp.segmento))?.value as

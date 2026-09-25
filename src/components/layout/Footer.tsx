@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { SenaiWordmark, SolucoesDigitaisWordmark } from "@/components/brand/Wordmarks";
 import { ContactLink } from "@/components/ui/ContactLink";
-import { capabilities } from "@/content/capabilities";
+import { filterCapabilities } from "@/content/capabilities";
 import { cases } from "@/content/cases";
 import { site } from "@/content/site";
 
@@ -43,10 +43,9 @@ import { site } from "@/content/site";
 
 type FooterLink = { href: string; label: string };
 
-const services: FooterLink[] = capabilities.map((c) => ({
-  href: c.slug === "cloud" ? "/aws" : `/cases?capacidade=${c.slug}`,
-  label: c.name,
-}));
+// Os mesmos serviços da home — sem Cloud e DevOps na AWS, que vive em Parcerias
+// e em /aws (link "Parceria AWS" em Empresa).
+const services: FooterLink[] = filterCapabilities.map((c) => ({ href: `/cases?capacidade=${c.slug}`, label: c.name }));
 
 const featuredCases: FooterLink[] = [
   ...cases.filter((c) => c.tier === "editorial").map((c) => ({ href: `/cases/${c.slug}`, label: c.name })),

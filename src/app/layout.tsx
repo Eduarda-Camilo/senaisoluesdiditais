@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Syne, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
+import { SiteEntry } from "@/components/layout/SiteEntry";
 import { site } from "@/content/site";
 import "./globals.css";
 
@@ -65,6 +66,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Ir para o conteúdo
         </a>
+        <SiteEntry />
         <Nav />
         {/* `overflow-clip` corta o fundo do Fale conosco, que desce por baixo do
             rodapé (ver home/Contact.tsx). `clip` não cria contêiner de rolagem,
