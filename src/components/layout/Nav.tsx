@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { List, X } from "@/components/ui/icons";
+import { ArrowUpRight, CaretDown, List, X } from "@/components/ui/icons";
 import { cn } from "@/lib/cn";
 
 /**
@@ -30,14 +30,23 @@ import { cn } from "@/lib/cn";
  *
  * Abaixo de `md` não há links na barra (ficam no menu lateral); lá ela é uma
  * faixa transparente com o símbolo e o botão do menu (fundo preto próprio).
+ *
+ * Submenus (pedido de 25/09): Cases, Parcerias e Trabalhe conosco abrem, ao
+ * passar o mouse ou focar pelo teclado, uma caixa com o link para a página
+ * própria da seção (lista de cases, /aws, vagas). O item em si continua levando
+ * à âncora da seção na home. No menu lateral o sublink aparece embaixo do item.
+ * Clicar em qualquer link do item fecha a caixa (tira o foco e ignora o hover
+ * até o mouse sair), para ela não continuar aberta na página seguinte.
  */
 
-const links = [
-  { href: "/#cases", label: "Cases" },
+type NavLink = { href: string; label: string; sub?: { href: string; label: string } };
+
+const links: NavLink[] = [
+  { href: "/#cases", label: "Cases", sub: { href: "/cases", label: "Ver todos" } },
   { href: "/#servicos", label: "Serviços" },
-  { href: "/#parcerias", label: "Parcerias" },
+  { href: "/#parcerias", label: "Parcerias", sub: { href: "/aws", label: "Serviços AWS" } },
   { href: "/#sobre", label: "Sobre" },
-  { href: "/#carreiras", label: "Trabalhe conosco" },
+  { href: "/#carreiras", label: "Trabalhe conosco", sub: { href: "/vagas", label: "Nossas vagas" } },
 ];
 
 /** Compacta depois de COMPACT_AT px e só volta abaixo de EXPAND_AT — sem piscar na fronteira. */
@@ -68,6 +77,10 @@ export function Nav() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  // Submenu fechado à força depois de um clique: o link clicado guarda o foco e
+  // o mouse segue em cima, então sem isso a caixa continuava aberta na página
+  // nova. Reabre quando o mouse sai do item.
+  const [dismissed, setDismissed] = useState<string | null>(null);
   const wide = useWide();
   const reduce = useReducedMotion();
 
@@ -137,16 +150,60 @@ export function Nav() {
             className="hidden md:flex items-center gap-8 text-base"
           >
             {links.map((l) => (
-              <li key={l.href}>
+              <li
+                key={l.href}
+                data-dismissed={dismissed === l.href || undefined}
+                className="group relative"
+                onClick={(e) => {
+                  if (!l.sub || !(e.target instanceof Element) || !e.target.closest("a")) return;
+                  setDismissed(l.href);
+                  (document.activeElement as HTMLElement | null)?.blur();
+                }}
+                onPointerLeave={() => setDismissed((d) => (d === l.href ? null : d))}
+              >
                 <Link
                   href={l.href}
                   className={cn(
-                    "transition-colors duration-fast py-2",
-                    compact ? "text-fg hover:text-azul-cibernetico" : "text-fg-muted hover:text-fg",
+                    "inline-flex items-center gap-1.5 transition-colors duration-fast py-2",
+                    compact
+                      ? "text-fg hover:text-azul-cibernetico group-focus-within:text-azul-cibernetico"
+                      : "text-fg-muted hover:text-fg group-hover:text-fg group-focus-within:text-fg",
                   )}
                 >
                   {l.label}
+                  {l.sub && (
+                    <CaretDown
+                      size={12}
+                      aria-hidden="true"
+                      className="transition-transform duration-base ease-out-quart group-hover:rotate-180 group-focus-within:rotate-180 group-data-dismissed:rotate-0!"
+                    />
+                  )}
                 </Link>
+                {l.sub && (
+                  // O `pt` é a ponte entre o item e a caixa: o mouse atravessa sem fechar.
+                  <div
+                    className={cn(
+                      "absolute left-1/2 top-full w-max -translate-x-1/2 pt-3",
+                      "invisible -translate-y-1 opacity-0 transition-[opacity,translate,visibility] duration-base ease-out-quart",
+                      "group-hover:visible group-hover:translate-y-0 group-hover:opacity-100",
+                      "group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100",
+                      "group-data-dismissed:invisible! group-data-dismissed:opacity-0!",
+                      "motion-reduce:transition-none",
+                    )}
+                  >
+                    <Link
+                      href={l.sub.href}
+                      className="group/sub flex items-center gap-2 whitespace-nowrap border border-line-strong bg-bg px-4 py-3 text-base text-fg transition-colors duration-fast hover:border-fg hover:text-azul-cibernetico focus-visible:text-azul-cibernetico"
+                    >
+                      {l.sub.label}
+                      <ArrowUpRight
+                        size={16}
+                        aria-hidden="true"
+                        className="transition-transform duration-fast group-hover/sub:translate-x-0.5 group-hover/sub:-translate-y-0.5"
+                      />
+                    </Link>
+                  </div>
+                )}
               </li>
             ))}
           </motion.ul>
@@ -191,14 +248,27 @@ export function Nav() {
                   </div>
                   <ul className="mt-10 flex flex-col divide-y divide-line">
                     {links.map((l) => (
-                      <li key={l.href}>
+                      <li key={l.href} className={l.sub ? "pb-5" : undefined}>
                         <Link
                           href={l.href}
                           onClick={() => setOpen(false)}
-                          className="flex items-baseline gap-4 py-5 font-display text-2xl font-semibold hover:text-accent-bright transition-colors"
+                          className={cn(
+                            "flex items-baseline gap-4 font-display text-2xl font-semibold hover:text-accent-bright transition-colors",
+                            l.sub ? "pt-5 pb-2" : "py-5",
+                          )}
                         >
                           {l.label}
                         </Link>
+                        {l.sub && (
+                          <Link
+                            href={l.sub.href}
+                            onClick={() => setOpen(false)}
+                            className="inline-flex items-center gap-2 py-1 text-base text-fg-muted transition-colors hover:text-fg"
+                          >
+                            {l.sub.label}
+                            <ArrowUpRight size={16} aria-hidden="true" />
+                          </Link>
+                        )}
                       </li>
                     ))}
                     <li>

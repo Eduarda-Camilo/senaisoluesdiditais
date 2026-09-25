@@ -52,7 +52,7 @@ export function Careers() {
               href="/vagas"
               className="group mt-8 inline-flex h-14 lg:h-16 items-center gap-3 rounded-xs bg-accent px-6 lg:px-7 text-lg font-medium tracking-wide text-fg transition-colors duration-fast hover:bg-accent-hover"
             >
-              Ver vagas abertas
+              Acessar vagas
               <Arrow className="transition-transform duration-base ease-out-quart group-hover:translate-x-0.5" />
             </Link>
           </div>

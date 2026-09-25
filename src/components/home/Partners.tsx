@@ -129,7 +129,7 @@ export function Partners() {
                 href="/aws"
                 className="group relative inline-flex h-14 items-center gap-3 rounded-xs bg-accent px-6 text-lg font-medium tracking-wide text-fg transition-colors duration-fast hover:bg-accent-hover"
               >
-                Conheça nossa atuação com AWS
+                Nossos serviços AWS
                 <Arrow className="transition-transform duration-base ease-out-quart group-hover:translate-x-0.5" />
               </Link>
             </div>

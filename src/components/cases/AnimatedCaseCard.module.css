@@ -34,7 +34,8 @@
   width: 996px;
   height: 283px;
   pointer-events: none;
-  transform: scale(var(--art-scale, 1));
+  /* --art-fit: ajuste fino por case, só no celular (ver media query). */
+  transform: scale(calc(var(--art-scale, 1) * var(--art-fit, 1)));
   transform-origin: right bottom;
   z-index: 1;
 }
@@ -47,4 +48,6 @@
 @media (max-width: 600px) {
   .card { min-height: 470px; padding-bottom: 220px; }
   .copy { min-height: 230px; width: 100%; padding: 22px; gap: 10px; }
+  /* As telas do AVA sobem muito e cobriam a descrição e a tag no celular. */
+  .card[data-case-slug='ava-senai'] { --art-fit: .78; }
 }

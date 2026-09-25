@@ -61,9 +61,11 @@
 .hero[data-entered='false'] .loadingGrid { opacity: 1; }
 @keyframes caret { 50% { opacity: 0; } }
 @media (max-width: 767px) {
-  /* Celular: o símbolo vem ANTES do texto, centralizado no alto do quadro, e o
-     texto começa logo abaixo da caixa dele (pedido de 25/09). */
-  .hero { --mark-size: min(330px, 84vw); --mark-left: 50%; --mark-top: calc(var(--mark-size) / 2); height: calc(100svh + 176px); min-height: 1040px; }
+  /* Celular: o símbolo vem ANTES do texto, no alto do quadro, e o texto começa
+     logo abaixo da caixa dele (pedido de 25/09). O desenho fica alinhado à
+     esquerda com o texto: a borda dele está a 17,4% da caixa (medido no pôster),
+     então o centro fica em calha + (50% - 17,4%) da caixa. */
+  .hero { --mark-size: min(330px, 84vw); --mark-left: calc(var(--spacing-gutter) + var(--mark-size) * .326); --mark-top: calc(var(--mark-size) / 2); height: calc(100svh + 176px); min-height: 1040px; }
   .stage { min-height: 800px; }
   .copy { padding-top: var(--mark-size); padding-bottom: 160px; }
   .senai { font-size: clamp(56px, 12vw, 88px); }
