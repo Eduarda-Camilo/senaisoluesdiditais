@@ -8,9 +8,8 @@ const nextConfig: NextConfig = {
   async redirects() {
     // Preserva URLs do site anterior
     return [
-      // A seção virou "Nossos serviços"; o destino é o portfólio filtrado por cloud.
-      { source: "/aws", destination: "/cases?capacidade=cloud", permanent: true },
-      { source: "/aws.html", destination: "/cases?capacidade=cloud", permanent: true },
+      // A página AWS voltou a existir (/aws, seção Parcerias — 25/09).
+      { source: "/aws.html", destination: "/aws", permanent: true },
       { source: "/portfolio.html", destination: "/cases", permanent: true },
       { source: "/index.html", destination: "/", permanent: true },
     ];

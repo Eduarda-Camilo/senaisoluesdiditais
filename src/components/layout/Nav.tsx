@@ -35,6 +35,7 @@ import { cn } from "@/lib/cn";
 const links = [
   { href: "/#cases", label: "Cases" },
   { href: "/#servicos", label: "Serviços" },
+  { href: "/#parcerias", label: "Parcerias" },
   { href: "/#sobre", label: "Sobre" },
   { href: "/#carreiras", label: "Trabalhe conosco" },
 ];

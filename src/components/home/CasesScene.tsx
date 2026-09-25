@@ -24,8 +24,13 @@ import { cn } from "@/lib/cn";
  * A transição é **contínua, não um corte**: o progresso do scroll vira um número
  * fracionário e a opacidade e o deslocamento de cada slide saem dele, quadro a
  * quadro. Não há `setState` no laço — os estilos são escritos direto no DOM, e o
- * React só re-renderiza quando o índice ativo (usado pela navegação vertical)
+ * React só re-renderiza quando o índice ativo (usado pela barra de progresso)
  * muda de fato.
+ *
+ * Barra de progresso (25/09, no lugar da navegação vertical): o mesmo indicador
+ * do carrossel do Trabalhe conosco — um traço por projeto, o ativo mais largo e
+ * se enchendo de branco conforme o scroll avança dentro dele. Clicar num traço
+ * rola até o projeto. Não tem botão de pausa: aqui quem avança é o scroll.
  *
  * Sem JS ou com prefers-reduced-motion, cai para uma lista estática equivalente.
  *
@@ -45,6 +50,7 @@ function smoothstep(t: number) {
 export function CasesScene() {
   const sectionRef = useRef<HTMLElement>(null);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const fillRef = useRef<HTMLSpanElement>(null);
   const [active, setActive] = useState(0);
   const reduce = useReducedMotion();
   const n = caseScenes.length;
@@ -90,11 +96,14 @@ export function CasesScene() {
         }
       });
 
-      // O rail segue o slide que está de fato dominando a tela, não floor(p) —
-      // senão ele troca depois da transição já ter acontecido.
+      // A barra segue o slide que está de fato dominando a tela, não floor(p) —
+      // senão ela troca depois da transição já ter acontecido.
       if (top1 >= 0 && top1 !== lastActive) {
         lastActive = top1;
         setActive(top1);
+      }
+      if (fillRef.current && top1 >= 0) {
+        fillRef.current.style.transform = `scaleX(${Math.min(Math.max(p - top1, 0), 1).toFixed(4)})`;
       }
     };
 
@@ -111,6 +120,14 @@ export function CasesScene() {
       if (frame) cancelAnimationFrame(frame);
     };
   }, [reduce, n]);
+
+  const pick = (i: number) => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const travel = el.offsetHeight - window.innerHeight;
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: top + ((i + 0.01) / n) * travel });
+  };
 
   if (reduce) return <StaticList />;
 
@@ -188,7 +205,7 @@ export function CasesScene() {
 
             {/* `pt`/`pb` reservam o título fixo em cima e o botão embaixo: o
                 conteúdo centraliza no espaço que sobra entre os dois. */}
-            <div className="container-site relative h-full flex items-center pt-36 pb-32 xl:pl-24">
+            <div className="container-site relative h-full flex items-center pt-36 pb-52 xl:pl-24">
               {/* Coluna estreita de propósito: o mosaico começa em 46% e o texto
                   não pode encostar nele. */}
               <div className="flex flex-col gap-7 max-w-[26rem]">
@@ -243,31 +260,59 @@ export function CasesScene() {
           </Link>
         </div>
 
-        <CaseRail active={active} />
+        <CaseBar active={active} fillRef={fillRef} onPick={pick} />
       </div>
     </section>
   );
 }
 
 /**
- * Navegação vertical da seção — só os traços, um por projeto; o ativo é mais
- * longo. O nome do projeto saiu (23/09): encostava no número grande do slide.
+ * Progresso da cena — o indicador do carrossel do Trabalhe conosco (ver
+ * CareersCarousel.tsx), em branco sobre o laranja. O preenchimento do ativo é
+ * escrito direto no DOM pelo laço de scroll (`fillRef`).
  */
-function CaseRail({ active }: { active: number }) {
+function CaseBar({
+  active,
+  fillRef,
+  onPick,
+}: {
+  active: number;
+  fillRef: React.RefObject<HTMLSpanElement | null>;
+  onPick: (i: number) => void;
+}) {
   return (
-    <div
-      aria-hidden="true"
-      className="hidden xl:flex absolute left-6 top-1/2 -translate-y-1/2 flex-col gap-3 pointer-events-none select-none"
-    >
-      {caseScenes.map((s, i) => (
-        <span
-          key={s.slug}
-          className={cn(
-            "block h-px transition-all duration-slow ease-out-expo",
-            i === active ? "w-8 bg-fg" : "w-4 bg-fg/40",
-          )}
-        />
-      ))}
+    <div className="container-site absolute inset-x-0 bottom-[11.5rem] xl:pl-24">
+      <div role="group" aria-label="Projetos em destaque" className="flex items-center gap-2">
+        {caseScenes.map((s, i) => {
+          const on = i === active;
+          return (
+            <button
+              key={s.slug}
+              type="button"
+              onClick={() => onPick(i)}
+              aria-label={`Ir para ${s.short} (${i + 1} de ${caseScenes.length})`}
+              aria-current={on || undefined}
+              className="group -my-3 cursor-pointer py-3"
+            >
+              <span
+                className={cn(
+                  "relative block h-1.5 overflow-hidden bg-fg/35 transition-[width,background-color] duration-slow ease-out-expo",
+                  on ? "w-24 sm:w-[11.25rem]" : "w-8 sm:w-12 group-hover:bg-fg/60",
+                )}
+              >
+                {on && (
+                  <span
+                    ref={fillRef}
+                    aria-hidden="true"
+                    className="absolute inset-0 origin-left bg-fg"
+                    style={{ transform: "scaleX(0)" }}
+                  />
+                )}
+              </span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

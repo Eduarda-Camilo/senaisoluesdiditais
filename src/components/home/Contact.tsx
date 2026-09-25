@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { ArrowRight, ArrowUpRight, Copy } from "@/components/ui/icons";
+import { ArrowRight, ArrowUpRight, Copy, X } from "@/components/ui/icons";
 import { Reveal } from "@/components/ui/Reveal";
 import { site } from "@/content/site";
+import { contactTopicLabel, setContactTopic, useContactTopic } from "@/lib/contact-topic";
 
 /**
  * Entre em contato (era "Fale conosco"; renomeado em 24/09, junto com o botão da
@@ -25,6 +26,10 @@ import { site } from "@/content/site";
  *
  * A submissão continua sendo um mailto: preenchido (decisão da equipe).
  *
+ * Quem chega pelos botões de Parcerias ou da /aws vem com um assunto marcado
+ * (contact-topic.ts): ele aparece acima do formulário, pode ser removido, e vai
+ * no título do e-mail para a equipe separar as propostas.
+ *
  * CONTEÚDO: o telefone é FICTÍCIO (pedido da equipe em 24/09, para a
  * apresentação) — ver `site.contact`. Sai como texto, sem link `tel:`, para
  * ninguém ligar para um número que pode ser de alguém. As redes saem de `site.social`; o mockup pede YouTube, que
@@ -38,6 +43,7 @@ const labelCls = "text-base text-fg";
 export function Contact() {
   const [sent, setSent] = useState(false);
   const [copied, setCopied] = useState(false);
+  const topic = useContactTopic();
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -45,7 +51,8 @@ export function Contact() {
     const nome = String(data.get("nome") ?? "");
     const email = String(data.get("email") ?? "");
     const msg = String(data.get("mensagem") ?? "");
-    const subject = encodeURIComponent(`[Site] Contato — ${nome}`);
+    const kind = topic ? contactTopicLabel[topic] : "Contato";
+    const subject = encodeURIComponent(`[Site] ${kind} — ${nome}`);
     const body = encodeURIComponent(`${msg}\n\n—\n${nome}\n${email}`);
     window.location.href = `mailto:${site.contact.email}?subject=${subject}&body=${body}`;
     setSent(true);
@@ -145,6 +152,21 @@ export function Contact() {
 
           <Reveal delay={0.1}>
             <form onSubmit={onSubmit} className="flex flex-col gap-5">
+              {topic && (
+                <p className="flex w-fit items-center gap-3 border border-azul-cibernetico py-1.5 pl-3 pr-1.5 text-sm">
+                  <span>
+                    <span className="text-fg-muted">Assunto:</span> {contactTopicLabel[topic]}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setContactTopic(null)}
+                    className="grid size-7 place-items-center text-fg-muted hover:text-fg transition-colors duration-fast"
+                  >
+                    <X size={16} weight="bold" aria-hidden="true" />
+                    <span className="sr-only">Remover assunto</span>
+                  </button>
+                </p>
+              )}
               <div className="grid gap-5 sm:grid-cols-2 sm:gap-x-2">
                 <div className="flex flex-col gap-3">
                   <label htmlFor="nome" className={labelCls}>

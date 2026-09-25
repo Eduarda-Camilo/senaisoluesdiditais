@@ -312,3 +312,23 @@
     transform: scaleX(1);
   }
 }
+
+/* Ilustração da seção Parcerias (home/AwsJourney.tsx). A construção é do
+   scroll; isto é só o idle depois de pronta — quase imperceptível. */
+[data-done="true"] .journey-float {
+  animation: journey-float 7s ease-in-out infinite;
+}
+@keyframes journey-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-done="true"] .journey-float {
+    animation: none;
+  }
+}

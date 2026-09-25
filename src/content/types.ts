@@ -75,10 +75,4 @@ export interface Capability {
   offer: string[];
   /** Evidência: slugs de cases. */
   cases: string[];
-  /** Conteúdo extra (AWS). */
-  aws?: {
-    badge: string;
-    intro: string;
-    services: { name: string; description: string }[];
-  };
 }

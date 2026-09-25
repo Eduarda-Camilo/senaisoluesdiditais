@@ -2,7 +2,8 @@ import type { Capability } from "./types";
 
 /**
  * Taxonomia única de capacidades. Consolida os 11 chips + 6 especialidades do site atual
- * e os 9 serviços da página /aws.html. Cada capacidade aponta para os cases que a comprovam.
+ * e os 9 serviços da página /aws.html. O detalhe da parceria AWS mora em partners.ts
+ * (seção Parcerias e página /aws); aqui Cloud continua como serviço e aponta para lá. Cada capacidade aponta para os cases que a comprovam.
  *
  * `description` resume o serviço só com o que está em `offer` (pedido de 24/09: a
  * frase "na voz do cliente" que existia antes era simulada e saiu).
@@ -91,22 +92,6 @@ export const capabilities: Capability[] = [
     ],
     // PENDENTE: confirmar quais cases rodam em AWS antes de listar evidências aqui.
     cases: [],
-    aws: {
-      badge: "AWS Partner — Select Tier Services",
-      intro:
-        "A SENAI Soluções Digitais integra o AWS Partner Network (APN), a rede global de parceiros da Amazon Web Services. Combinamos a experiência em soluções industriais desde 2007 com as práticas AWS para modernizar aplicações, migrar cargas de trabalho e construir produtos digitais escaláveis, seguros e resilientes.",
-      services: [
-        { name: "Modernização de aplicações", description: "Refatoração e evolução de aplicações legadas para arquiteturas modernas, cloud-native e escaláveis." },
-        { name: "Migração para AWS", description: "Assessment, planejamento e execução da migração de aplicações e infraestrutura on-premises." },
-        { name: "Desenvolvimento cloud native", description: "Aplicações web, APIs, microsserviços e integrações com boas práticas para execução na AWS." },
-        { name: "DevOps e CI/CD", description: "Pipelines de integração e entrega contínua, automação de deploys e práticas DevOps." },
-        { name: "IA generativa", description: "Soluções com Amazon Bedrock para automatizar processos, criar assistentes inteligentes e transformar dados." },
-        { name: "Arquitetura de soluções", description: "Definição de arquiteturas escaláveis, seguras e resilientes." },
-        { name: "Containers e orquestração", description: "Implantação com Amazon ECS." },
-        { name: "Bancos de dados gerenciados", description: "Amazon RDS." },
-        { name: "Observabilidade", description: "Monitoramento com Amazon CloudWatch." },
-      ],
-    },
   },
 ];
 

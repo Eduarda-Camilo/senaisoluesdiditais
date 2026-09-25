@@ -3,6 +3,7 @@ import { Careers } from "@/components/home/Careers";
 import { CasesScene } from "@/components/home/CasesScene";
 import { Contact } from "@/components/home/Contact";
 import { Hero } from "@/components/home/Hero";
+import { Partners } from "@/components/home/Partners";
 import { GlobeTrack } from "@/components/home/GlobeTrack";
 import { Services } from "@/components/home/Services";
 
@@ -21,9 +22,12 @@ export default function HomePage() {
     <>
       <Hero />
       <CasesScene />
-      {/* O globo atravessa as três seções e termina no Trabalhe conosco. */}
+      {/* O globo atravessa as seções e termina no Trabalhe conosco. Parcerias
+          fica logo depois de Serviços (25/09) e, com fundo próprio, cobre o
+          globo enquanto passa. */}
       <GlobeTrack>
         <Services />
+        <Partners />
         <About />
         <Careers />
       </GlobeTrack>

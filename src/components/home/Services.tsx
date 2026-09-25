@@ -17,7 +17,8 @@ import { GlobeAnchor } from "./GlobeTrack";
  * inteira, sem índice numérico à esquerda e sem contador (ref studiors).
  *
  * O serviço em destaque mostra uma descrição curta do que ele entrega (de
- * `capabilities.ts`) e o CTA leva ao portfólio já filtrado.
+ * `capabilities.ts`) e o CTA leva ao portfólio já filtrado — menos Cloud, que
+ * leva à página /aws (a parceria tem seção própria, Parcerias).
  *
  * Os numerais `01`–`06` continuam existindo em `capabilities.ts` e aparecem em
  * /cases; aqui eles saíram porque disputavam atenção com o título.
@@ -93,10 +94,14 @@ export function Services() {
                         {cap.description}
                       </p>
                       <Link
-                        href={`/cases?capacidade=${cap.slug}`}
+                        href={cap.slug === "cloud" ? "/aws" : `/cases?capacidade=${cap.slug}`}
                         className="group inline-flex items-center gap-2 text-sm font-medium w-fit hover:text-accent-bright transition-colors duration-fast"
                       >
-                        {count > 0 ? `Ver ${count} projetos` : "Ver o portfólio"}
+                        {cap.slug === "cloud"
+                          ? "Conheça as soluções AWS"
+                          : count > 0
+                            ? `Ver ${count} projetos`
+                            : "Ver o portfólio"}
                         <ArrowUpRight
                           size={16}
                           weight="bold"
