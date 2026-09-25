@@ -191,7 +191,7 @@ export function Contact() {
                     type="email"
                     required
                     autoComplete="email"
-                    placeholder="seuemail@empresa.com.br"
+                    placeholder="Seu e-mail"
                     className={fieldCls}
                   />
                 </div>

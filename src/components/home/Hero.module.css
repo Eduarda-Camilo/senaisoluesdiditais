@@ -1,0 +1,64 @@
+.hero {
+  --mark-size: min(68.263889vw, 983px);
+  --mark-left: calc(50% + min(27.881944vw, 401.5px));
+  --mark-top: calc(var(--mark-size) / 2 - 49px);
+  position: relative;
+  isolation: isolate;
+  z-index: 0;
+  background: var(--color-bg);
+  height: calc(100svh + 236px);
+  min-height: 1136px;
+}
+.stage { position: sticky; top: 64px; height: calc(100svh - 64px); min-height: 836px; overflow: clip; }
+.grid, .loadingGrid { position: absolute; inset: 13px 0 0; pointer-events: none; background: url('/hero/grid.svg') left top / 100% 100% no-repeat; transition: opacity 1.4s ease; }
+.loadingGrid { top: 44px; background-image: url('/hero/grid-loading.svg'); opacity: 0; }
+.copy { position: relative; z-index: 2; width: fit-content; padding-top: max(100px, calc((100svh - 559px) / 2)); margin-left: max(var(--spacing-gutter), calc((100% - var(--container-site)) / 2 + var(--spacing-gutter))); padding-bottom: 170px; opacity: 1; transition: opacity .8s ease; pointer-events: none; }
+@media (min-width: 1024px) { .copy { margin-left: max(var(--spacing-gutter-lg), calc((100% - var(--container-site)) / 2 + var(--spacing-gutter-lg))); } }
+.senai { display: block; font-size: clamp(72px, 7.9708vw, 114.78px); line-height: .9; letter-spacing: -.2701px; }
+.solutions { display: block; color: var(--color-azul-solucao); font-size: clamp(50px, 5.5687vw, 80.189px); line-height: 1.1; letter-spacing: -.3084px; }
+.tagline { margin-top: 64px; font-size: clamp(26px, 2.7685vw, 39.866px); line-height: 1.2516; letter-spacing: -.7716px; }
+.wordSlot { display: inline-block; min-width: 5.6em; }
+.word { background: var(--color-azul-solucao); color: var(--color-bg); font-weight: 700; padding: 0 .04em; }
+.word::after { content: ''; display: inline-block; height: .85em; border-right: 2px solid currentColor; margin-left: 2px; animation: caret 1s steps(1) infinite; }
+.markScroll { position: fixed; inset: 64px 0 0; z-index: 1; pointer-events: none; }
+.mark {
+  position: absolute;
+  width: var(--mark-size);
+  height: var(--mark-size);
+  left: var(--mark-left);
+  top: var(--mark-top);
+  translate: -50% -50%;
+  pointer-events: auto;
+  transition: left .65s cubic-bezier(.3,0,.75,1), top .65s cubic-bezier(.3,0,.75,1);
+}
+.hero[data-phase='loading'] .mark, .hero[data-phase='growing'] .mark {
+  left: 50%;
+  top: calc((100svh - 64px) / 2 - 32px);
+  pointer-events: none;
+}
+.markVisual { width: 100%; height: 100%; transform-origin: center; transform: scale(1); transition: transform .7s cubic-bezier(.3,0,.75,1); }
+.hero[data-phase='loading'] .markVisual { transform: scale(calc(327px / var(--mark-size))); }
+.percentage { position: absolute; z-index: 3; left: 50%; top: calc((100svh - 64px) / 2 + 150px); translate: -50% 0; font-family: var(--font-display); font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--color-fg); }
+
+.hero[data-entered='false'] .copy, .hero[data-entered='false'] .grid { opacity: 0; }
+.hero[data-entered='false'] .loadingGrid { opacity: 1; }
+@keyframes caret { 50% { opacity: 0; } }
+@media (max-width: 767px) {
+  .hero { --mark-size: 390px; --mark-left: calc(50% + 85px); --mark-top: 130px; height: calc(100svh + 176px); min-height: 1040px; }
+  .stage { min-height: 800px; }
+  .copy { padding-top: 310px; padding-bottom: 160px; }
+  .senai { font-size: clamp(56px, 12vw, 88px); }
+  .solutions { font-size: clamp(40px, 9vw, 64px); }
+  .tagline { font-size: clamp(23px, 5.7vw, 32px); margin-top: 32px; letter-spacing: -.5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mark, .markVisual, .copy, .grid, .loadingGrid { transition: none; animation: none !important; }
+  .word::after { animation: none; display: none; }
+  .hero { height: auto; min-height: 0; }
+  .stage { position: relative; }
+  .markScroll { position: absolute; inset: 0; }
+}
+
+/* This intro rule is scoped to the home hero; other headers keep their behavior. */
+:global(body):has(.hero[data-entered="false"]) :global(header) { opacity: 0; pointer-events: none; }
+:global(body):has(.hero[data-entered="false"]) :global(header nav) { visibility: hidden; }

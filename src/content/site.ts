@@ -27,12 +27,8 @@ export const site = {
 
   // Contato
   contact: {
-    /**
-     * Veio do mockup da seção Fale conosco (equipe, 23/09/2026). É um endereço
-     * plausível no domínio do SENAI-SC, mas ainda não confirmado pela equipe —
-     * a variável de ambiente tem precedência para poder corrigir sem build.
-     */
-    email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "solucoesdigitais@sc.senai.br",
+    /** Endereço de contato confirmado pela equipe em 25/09/2026. */
+    email: "solucoesdigitais@sc.senai.br",
     emailPending: false,
     /**
      * FICTÍCIO — pedido da equipe em 24/09 para a apresentação: um número de Santa

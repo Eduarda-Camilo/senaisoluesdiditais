@@ -8,6 +8,7 @@ import { ArrowUpRight } from "@/components/ui/icons";
 import { cases } from "@/content/cases";
 import { caseScenes } from "@/content/scenes";
 import { cn } from "@/lib/cn";
+import { useLiquidEntrance } from "./useLiquidEntrance";
 
 /**
  * Nossos cases — cena única em laranja, a segunda seção da home.
@@ -53,6 +54,7 @@ export function CasesScene() {
   const fillRef = useRef<HTMLSpanElement>(null);
   const [active, setActive] = useState(0);
   const reduce = useReducedMotion();
+  const entranceRef = useLiquidEntrance(sectionRef, reduce);
   const n = caseScenes.length;
 
   useEffect(() => {
@@ -136,15 +138,11 @@ export function CasesScene() {
       ref={sectionRef}
       id="cases"
       aria-labelledby="cases-titulo"
-      className="relative bg-mark text-fg"
+      className="relative z-10 text-fg"
       style={{ height: `${n * 100}svh` }}
     >
-      {/* Continuação do arco do Hero: começa com as mesmas cores da borda dele
-          (laranja no centro, escuro nas laterais) e desbota para o laranja
-          chapado. Fica fora do quadro fixo, então sobe com o scroll. */}
-      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-[60svh] bg-arc-tail pointer-events-none" />
 
-      <div className="sticky top-0 h-svh overflow-hidden">
+      <div ref={entranceRef} className="sticky top-0 h-svh overflow-hidden bg-mark" style={{ willChange: "clip-path" }}>
         {/* Malha suave (12%): textura, não grade de planilha — pedido de 23/09. */}
         <div
           aria-hidden="true"

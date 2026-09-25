@@ -3,66 +3,37 @@
 import { useReducedMotion } from "motion/react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useSyncExternalStore } from "react";
+import { Component, useEffect, useSyncExternalStore, type ReactNode } from "react";
 
-/**
- * Invólucro do símbolo 3D do Hero.
- *
- * Degradação em três níveis (docs/DIRECAO-V2.md §5.6): com prefers-reduced-motion,
- * sem WebGL ou se o import dinâmico falhar, fica o SVG estático — que é também o
- * que aparece enquanto a cena carrega. O site nunca depende do 3D para existir.
- */
-
-const Scene = dynamic(() => import("./LogoMark3DScene"), {
-  ssr: false,
-  loading: () => <Poster />,
-});
-
+const Scene = dynamic(() => import("./LogoMark3DScene"), { ssr: false, loading: () => <Poster /> });
 function Poster() {
-  return (
-    <Image
-      src="/brand/sd-simbolo-branco.svg"
-      alt=""
-      aria-hidden="true"
-      width={122}
-      height={145}
-      priority
-      className="absolute inset-0 m-auto w-[45%] max-w-[16rem] h-auto opacity-90"
-    />
-  );
+  return <Image src="/hero/mark-poster-warm.png" alt="" fill priority sizes="(max-width: 767px) 390px, 983px" className="object-contain" />;
 }
-
+class SceneBoundary extends Component<{ children: ReactNode; onReady: () => void }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch() { this.props.onReady(); }
+  render() { return this.state.failed ? <Poster /> : this.props.children; }
+}
 let webglCache: boolean | null = null;
 function hasWebGL() {
   if (webglCache === null) {
     try {
-      const canvas = document.createElement("canvas");
-      webglCache = Boolean(window.WebGLRenderingContext && canvas.getContext("webgl2"));
-    } catch {
-      webglCache = false;
-    }
+      const gl = document.createElement("canvas").getContext("webgl2");
+      webglCache = !!gl;
+      gl?.getExtension("WEBGL_lose_context")?.loseContext();
+    } catch { webglCache = false; }
   }
   return webglCache;
 }
-
-// `false` no servidor e durante a hidratação, `true` depois — sem setState em effect.
-// Mantém o poster no HTML inicial, fora do caminho do LCP.
+const ignoreReady = () => {};
 const neverChanges = () => () => {};
-const useHydrated = () =>
-  useSyncExternalStore(
-    neverChanges,
-    () => true,
-    () => false,
-  );
-
-export function LogoMark3D() {
+export function LogoMark3D({ onReady = ignoreReady, intro = false }: { onReady?: () => void; intro?: boolean }) {
   const reduce = useReducedMotion();
-  const hydrated = useHydrated();
+  const hydrated = useSyncExternalStore(neverChanges, () => true, () => false);
   const enabled = hydrated && !reduce && hasWebGL();
-
-  return (
-    <div className="relative aspect-square w-full max-w-[34rem] mx-auto">
-      {enabled ? <Scene /> : <Poster />}
-    </div>
-  );
+  useEffect(() => { if (hydrated && !enabled) onReady(); }, [hydrated, enabled, onReady]);
+  return <div className="relative h-full w-full" aria-hidden="true">
+    <SceneBoundary onReady={onReady}>{enabled ? <Scene onReady={onReady} intro={intro} /> : <Poster />}</SceneBoundary>
+  </div>;
 }

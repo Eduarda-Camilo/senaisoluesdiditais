@@ -1,7 +1,7 @@
 "use client";
 
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useMemo, useRef, useState } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader.js";
 
@@ -35,7 +35,7 @@ function useMarkGeometries() {
     const geometries = shapes.map((shape) => {
       const geo = new THREE.ExtrudeGeometry(shape, EXTRUDE);
       // O eixo Y do SVG aponta para baixo; o do three.js, para cima.
-      geo.scale(1, -1, 1);
+      // Flip Y on the group so Three also corrects the face winding.
       geo.computeVertexNormals();
       return geo;
     });
@@ -53,101 +53,49 @@ function useMarkGeometries() {
   }, []);
 }
 
-function Mark({ idle }: { idle: boolean }) {
+function Mark({ onReady, intro }: { onReady: () => void; intro: boolean }) {
   const group = useRef<THREE.Group>(null);
-  const halves = useRef<(THREE.Mesh | null)[]>([]);
-  const [open, setOpen] = useState(false);
-  const openAmount = useRef(0);
   const geometries = useMarkGeometries();
-  const { size } = useThree();
-
-  const pointer = useRef({ x: 0, y: 0 });
-  const scale = size.width < 640 ? 0.019 : 0.024;
-
+  const ready = useRef(false);
+  const rotation = useRef(0);
+  const speed = useRef(.55);
+  const lastPointer = useRef({ x: 0, y: 0, movedAt: 0 });
   useFrame((state, delta) => {
+    if (!ready.current) { ready.current = true; onReady(); }
     const g = group.current;
     if (!g) return;
-
-    // (b) parallax amortecido na direção do cursor, limitado para não desmontar a leitura
-    pointer.current.x = state.pointer.x;
-    pointer.current.y = state.pointer.y;
-    const targetY = THREE.MathUtils.clamp(pointer.current.x * 0.6, -0.35, 0.35);
-    const targetX = THREE.MathUtils.clamp(-pointer.current.y * 0.5, -0.35, 0.35);
-    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, targetY, 4, delta);
-    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, targetX, 4, delta);
-
-    // (a) rotação lenta de repouso — só no desktop e só enquanto o ponteiro está fora
-    if (idle) g.rotation.y += delta * 0.15;
-
-    // (c) interação assinatura: as duas metades se afastam e voltam
-    openAmount.current = THREE.MathUtils.damp(openAmount.current, open ? 1 : 0, 6, delta);
-    const a = openAmount.current;
-    halves.current.forEach((mesh, i) => {
-      if (!mesh) return;
-      const dir = i === 0 ? -1 : 1;
-      mesh.position.x = dir * a * 14;
-      mesh.position.y = dir * a * -10;
-      mesh.rotation.z = dir * a * THREE.MathUtils.degToRad(12);
-    });
+    const p = lastPointer.current;
+    const now = state.clock.elapsedTime;
+    const dx = state.pointer.x - p.x;
+    const dy = state.pointer.y - p.y;
+    if (!intro && Math.abs(dx) + Math.abs(dy) > .001) {
+      rotation.current += dx * .7;
+      p.movedAt = now;
+    }
+    speed.current = THREE.MathUtils.damp(speed.current, intro ? .55 : .12, 3, delta);
+    if (intro || now - p.movedAt > .25) rotation.current += Math.min(delta, .05) * speed.current;
+    p.x = state.pointer.x;
+    p.y = state.pointer.y;
+    const targetY = rotation.current;
+    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, targetY, 2.5, delta);
+    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, intro ? Math.sin(now * .3) * .04 : -state.pointer.y * .12, 2.5, delta);
+    g.position.y = THREE.MathUtils.damp(g.position.y, Math.sin(now * (intro ? 1.8 : 1.2)) * (intro ? .24 : .1), 2.5, delta);
   });
-
-  function toggle() {
-    setOpen(true);
-    window.setTimeout(() => setOpen(false), 900);
-  }
-
-  return (
-    <group
-      ref={group}
-      scale={scale}
-      onClick={toggle}
-      onPointerOver={() => (document.body.style.cursor = "pointer")}
-      onPointerOut={() => (document.body.style.cursor = "")}
-    >
-      {geometries.map((geo, i) => (
-        <mesh
-          key={i}
-          ref={(m) => {
-            halves.current[i] = m;
-          }}
-          geometry={geo}
-        >
-          {/* Metalness alta sem environment map reflete o vazio e a peça fica cinza.
-              Sem HDRI (peso), então a superfície é quase dielétrica e o brilho vem
-              das luzes — que é onde as cores da marca entram. */}
-          <meshStandardMaterial color="#ffffff" metalness={0.15} roughness={0.28} />
-        </mesh>
-      ))}
-    </group>
-  );
+  return <group ref={group} scale={[.0175, -.0175, .0175]}>
+    {geometries.map((geo, i) => <mesh key={i} geometry={geo}>
+      <meshStandardMaterial color="#a8a4a3" metalness={.22} roughness={.3} />
+    </mesh>)}
+  </group>;
 }
 
-export default function LogoMark3DScene() {
-  const [hovering, setHovering] = useState(false);
-
-  // Em ponteiro grosso (toque) não há hover para interromper a rotação, e girar
-  // sem parar vira ruído — no mobile o símbolo fica parado e só responde ao tap.
-  const coarse =
-    typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
-
-  return (
-    <Canvas
-      camera={{ position: [0, 0, 4.2], fov: 45 }}
-      dpr={[1, 1.5]}
-      gl={{ antialias: true, alpha: true }}
-      onPointerEnter={() => setHovering(true)}
-      onPointerLeave={() => setHovering(false)}
-      // O canvas é decorativo: o nome da marca já está no texto do Hero e na Nav.
-      aria-hidden="true"
-    >
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[4, 5, 6]} intensity={2.6} color="#ffffff" />
-      <directionalLight position={[-3, -2, 4]} intensity={0.8} color="#ffffff" />
-      {/* A marca entra como luz, não como tinta. */}
-      <pointLight position={[4, -2, -3]} intensity={70} color="#e84910" />
-      {/* Mockup de 23/09: as arestas acendem em laranja dos dois lados, sem azul. */}
-      <pointLight position={[-5, 3, 2]} intensity={45} color="#e84910" />
-      <Mark idle={!coarse && !hovering} />
-    </Canvas>
-  );
+export default function LogoMark3DScene({ onReady, intro }: { onReady: () => void; intro: boolean }) {
+  return <Canvas resize={{ offsetSize: true }} camera={{ position: [0, 0, 4.2], fov: 45 }} dpr={[1, 1.5]} gl={{ antialias: true, alpha: true }} aria-hidden="true" style={{ touchAction: "pan-y" }}>
+    <ambientLight intensity={.45} />
+    <directionalLight position={[4, 5, 6]} intensity={1.9} color="#ffffff" />
+    <directionalLight position={[-3, -2, 4]} intensity={.8} color="#ffffff" />
+    <pointLight position={[0, -3, 1]} intensity={50} color="#ff681c" />
+    <directionalLight position={[0, -5, 1]} intensity={1.1} color="#ff8b46" />
+    <pointLight position={[-5, 3, 2]} intensity={25} color="#e84910" />
+    <Mark onReady={onReady} intro={intro} />
+  </Canvas>;
 }
