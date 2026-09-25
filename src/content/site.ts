@@ -136,9 +136,9 @@ export const careers = {
     },
   ],
   photos: [
-    { src: "/carreiras/equipe-01.webp", alt: "Três colegas sorriem enquanto acompanham uma apresentação em um encontro da equipe" },
-    { src: "/carreiras/equipe-02.webp", alt: "Colaboradora sorri durante uma dinâmica em grupo com colegas" },
     { src: "/carreiras/equipe-03.webp", alt: "Colaborador fala ao microfone para a equipe, ao lado de dois colegas" },
+    { src: "/carreiras/equipe-02.webp", alt: "Colaboradora sorri durante uma dinâmica em grupo com colegas" },
+    { src: "/carreiras/equipe-01.webp", alt: "Três colegas sorriem enquanto acompanham uma apresentação em um encontro da equipe" },
     { src: "/carreiras/equipe-04.webp", alt: "Dois colaboradores acompanham uma apresentação" },
     { src: "/carreiras/equipe-05.webp", alt: "Colaboradora posa em frente ao painel da SENAI Soluções Digitais", position: "50% 30%" },
   ],
